@@ -17,6 +17,14 @@ void AHexTile::setAxial(int r, int q)
 	m_axialQ = q;
 	m_axialS = -r - q;
 	
-	this->SetActorLabel(FString::Printf(TEXT("Tile: %d,%d"),r,q));
+	this->SetActorLabel(FString::Printf(TEXT("Tile: r:%d, q:%d"),r,q));
+}
+
+void AHexTile::setIndex(int x, int y)
+{
+	m_indexX = x;
+	m_indexY = y;
+
+	//this->SetActorLabel(FString::Printf(TEXT("Tile: x:%d, y:%d"), x, y));
 }
 

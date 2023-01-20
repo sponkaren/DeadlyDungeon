@@ -43,9 +43,16 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Tile");
 	int m_axialS;
 
+	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
+	int m_indexX;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Tile");
+	int m_indexY;
+
 public:	
 	// Sets default values for this actor's properties
 	AHexTile();
 
 	void setAxial(int, int);
+	void setIndex(int, int);
 };

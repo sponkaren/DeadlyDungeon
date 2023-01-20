@@ -25,8 +25,8 @@ void AHexGridManager::BeginPlay()
 	// always starting grid at position 0,0,0
 	int r{ 0 };
 	int q{ 0 };
-	int indexR{ 0 };
-	int indexQ{ 0 };
+	int indexX{ 0 };
+	int indexY{ 0 };
 
 	
 	for (int tileNumber{ 1 }; tileNumber <= numberOfTiles; tileNumber++)
@@ -35,22 +35,23 @@ void AHexGridManager::BeginPlay()
 
 		AHexTile* newTile = GetWorld()->SpawnActor<AHexTile>
 			(tileToSpawn, AxialPixelConversion::axialToPixel(r, q), Rotation);
-		newTile->setAxial(r, q);		
-		HexGrid2DArray[indexR][indexQ] = newTile;
+		newTile->setAxial(r, q);
+		newTile->setIndex(indexX, indexY);
+		HexGrid2DArray[indexX][indexY] = newTile;
 
 		int qTopValue{ m_gridHeight - (r + 1) / 2 - (r + 1) % 2 };
 		if (q < qTopValue)
 		{
 			++q;
-			indexQ++;
+			indexY++;
 		}
 		else
 		{
 			r++;
 			q = qTopValue - m_gridHeight + r % 2;
 
-			indexR++;
-			indexQ = 0;
+			indexX++;
+			indexY = 0;
 
 		}
 	}

@@ -4,9 +4,6 @@
 
 #include "CoreMinimal.h"
 
-/**
- * 
- */
 class DEADLYDUNGEON_API AxialPixelConversion
 {
 public:
