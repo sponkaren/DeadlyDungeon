@@ -5,7 +5,7 @@
 
 FVector AxialPixelConversion::axialToPixel(int r, int q)
 {
-    int size{ 104 };
+    constexpr int size{ 104 };
 
     int x = size * (3. / 2 * q);
     int y = size * (sqrt(3) / 2 * q + sqrt(3) * r);

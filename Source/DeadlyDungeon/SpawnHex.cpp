@@ -16,9 +16,6 @@ void ASpawnHex::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	const int gridWidth{ 8 };
-	const int gridHeight{ 8 };
-	
 	int r{ 0 };
 	int q{ 0 };
 
@@ -32,8 +29,8 @@ void ASpawnHex::BeginPlay()
 
 		// always starting grid at position 0,0,0
 
-		GetWorld()->SpawnActor<AActor>(HexToSpawn, AxialPixelConversion::axialToPixel(r, q) , Rotation);
-
+		GetWorld()->SpawnActor<AActor>(HexToSpawn, AxialPixelConversion::axialToPixel(r, q) , Rotation);	
+		//UHexTileClass::setAxial(r,q);
 
 		int qTopValue{ gridHeight - (r + 1) / 2 - (r + 1) % 2 };
 

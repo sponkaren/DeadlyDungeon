@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "AxialPixelConversion.h"
+#include "HexTileClass.h"
 #include "SpawnHex.generated.h"
 
 UCLASS()
@@ -15,6 +16,12 @@ class DEADLYDUNGEON_API ASpawnHex : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ASpawnHex();
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+		int32 gridWidth{};
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+		int32 gridHeight{};
 
 protected:
 	// Called when the game starts or when spawned
