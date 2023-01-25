@@ -2,6 +2,7 @@
 
 
 #include "HexGridManager.h"
+#include <assert.h>
 
 // Sets default values
 AHexGridManager::AHexGridManager()
@@ -13,14 +14,20 @@ void AHexGridManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	//HexGrid2dArray
+	/*
 	HexGrid2DArray.SetNumZeroed(m_gridWidth);
 	for (int32 i{ 0 }; i < HexGrid2DArray.Num(); ++i)
 	{
 		HexGrid2DArray[i].SetNumZeroed(m_gridHeight);
 	}
+	*/
 
 	const int numberOfTiles{ m_gridWidth * m_gridHeight };
+	HexGridArray.SetNumZeroed(numberOfTiles);
 	
+	
+
 	FRotator Rotation = GetActorRotation();
 	// always starting grid at position 0,0,0
 	int r{ 0 };
@@ -29,15 +36,15 @@ void AHexGridManager::BeginPlay()
 	int indexY{ 0 };
 
 	
-	for (int tileNumber{ 1 }; tileNumber <= numberOfTiles; tileNumber++)
+	for (int tileNumber{ 0 }; tileNumber < numberOfTiles; tileNumber++)
 	{
 		TSubclassOf<AHexTile> tileToSpawn = m_grassHexTile;
 
 		AHexTile* newTile = GetWorld()->SpawnActor<AHexTile>
 			(tileToSpawn, AxialPixelConversion::axialToPixel(r, q), Rotation);
 		newTile->setAxial(r, q);
-		newTile->setIndex(indexX, indexY);
-		HexGrid2DArray[indexX][indexY] = newTile;
+		newTile->setIndex(tileNumber);
+		HexGridArray[tileNumber] = newTile;
 
 		int qTopValue{ m_gridHeight - (r + 1) / 2 - (r + 1) % 2 };
 		if (q < qTopValue)
@@ -56,4 +63,3 @@ void AHexGridManager::BeginPlay()
 		}
 	}
 }
-

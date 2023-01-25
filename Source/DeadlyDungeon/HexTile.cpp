@@ -9,6 +9,7 @@ AHexTile::AHexTile()
 	m_rootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	m_tileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
 	m_tileMesh->SetupAttachment(m_rootComponent);
+	occupied = false;
 }
 
 void AHexTile::setAxial(int r, int q)
@@ -20,11 +21,8 @@ void AHexTile::setAxial(int r, int q)
 	this->SetActorLabel(FString::Printf(TEXT("Tile: r:%d, q:%d"),r,q));
 }
 
-void AHexTile::setIndex(int x, int y)
+void AHexTile::setIndex(int i)
 {
-	m_indexX = x;
-	m_indexY = y;
-
-	//this->SetActorLabel(FString::Printf(TEXT("Tile: x:%d, y:%d"), x, y));
+	m_index = i;
 }
 

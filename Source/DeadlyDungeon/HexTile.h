@@ -34,6 +34,9 @@ protected:
 
 	USceneComponent* m_rootComponent;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
+		bool occupied;
+
 	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
 	int m_axialR;
 
@@ -44,15 +47,12 @@ protected:
 	int m_axialS;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
-	int m_indexX;
-
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Tile");
-	int m_indexY;
+	int m_index;
 
 public:	
 	// Sets default values for this actor's properties
 	AHexTile();
 
 	void setAxial(int, int);
-	void setIndex(int, int);
+	void setIndex(int);
 };

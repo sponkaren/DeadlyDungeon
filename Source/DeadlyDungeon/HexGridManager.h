@@ -15,7 +15,9 @@ class DEADLYDUNGEON_API AHexGridManager : public AActor
 
 protected:
 
-	TArray<TArray<AHexTile*>>  HexGrid2DArray;
+	//TArray<TArray<AHexTile*>>  HexGrid2DArray;
+
+	TArray<AHexTile*> HexGridArray;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid Layout")
 		int32 m_gridWidth;
@@ -32,6 +34,8 @@ protected:
 public:	
 	// Sets default values for this actor's properties
 	AHexGridManager();
+
+	friend class APlayerManager;
 
 protected:
 	// Called when the game starts or when spawned
