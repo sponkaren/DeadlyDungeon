@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/Pawn.h"
 #include "HexTile.h"
 #include "PlayerCharacter.generated.h"
 
@@ -17,7 +17,7 @@ enum class PlayerCharacterType : uint8
 };
 
 UCLASS()
-class DEADLYDUNGEON_API APlayerCharacter : public AActor
+class DEADLYDUNGEON_API APlayerCharacter : public APawn
 {
 	GENERATED_BODY()
 	
@@ -28,7 +28,9 @@ protected:
 		PlayerCharacterType m_playerCharacterType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-		UStaticMeshComponent* m_playerCharacterMesh;
+		USkeletalMeshComponent* m_playerCharacterMesh;
+
+	USceneComponent* m_rootComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 		AHexTile* hexLocation {};
@@ -38,6 +40,12 @@ protected:
 
 
 public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
 	APlayerCharacter();
 
 	void setLocation(AHexTile&);

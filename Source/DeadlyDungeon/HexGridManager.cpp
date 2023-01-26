@@ -4,9 +4,12 @@
 #include "HexGridManager.h"
 #include <assert.h>
 
+TArray<AHexTile*> AHexGridManager::HexGridArray{};
+
 // Sets default values
 AHexGridManager::AHexGridManager()
 {
+
 }
 
 // Called when the game starts or when spawned
@@ -39,11 +42,16 @@ void AHexGridManager::BeginPlay()
 	for (int tileNumber{ 0 }; tileNumber < numberOfTiles; tileNumber++)
 	{
 		TSubclassOf<AHexTile> tileToSpawn = m_grassHexTile;
-
+		FVector Location = AxialPixelConversion::axialToPixel(r, q);
+		
 		AHexTile* newTile = GetWorld()->SpawnActor<AHexTile>
-			(tileToSpawn, AxialPixelConversion::axialToPixel(r, q), Rotation);
+			(tileToSpawn, Location, Rotation);
+		
+		//setting some tile data
 		newTile->setAxial(r, q);
+		newTile->setLocation(Location);
 		newTile->setIndex(tileNumber);
+
 		HexGridArray[tileNumber] = newTile;
 
 		int qTopValue{ m_gridHeight - (r + 1) / 2 - (r + 1) % 2 };

@@ -6,6 +6,22 @@
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
+	m_rootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
+	m_playerCharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	m_playerCharacterMesh->SetupAttachment(m_rootComponent);
+}
+
+// Called every frame
+void APlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+// Called to bind functionality to input
+void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 

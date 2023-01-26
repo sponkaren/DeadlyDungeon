@@ -38,6 +38,9 @@ protected:
 		bool occupied;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
+	FVector m_location;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
 	int m_axialR;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Tile");
@@ -55,4 +58,8 @@ public:
 
 	void setAxial(int, int);
 	void setIndex(int);
+
+	void setLocation(FVector);
+	
+	FVector getLocation();
 };

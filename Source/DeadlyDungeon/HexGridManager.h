@@ -17,8 +17,6 @@ protected:
 
 	//TArray<TArray<AHexTile*>>  HexGrid2DArray;
 
-	TArray<AHexTile*> HexGridArray;
-
 	UPROPERTY(EditAnywhere, Category = "HexGrid Layout")
 		int32 m_gridWidth;
 
@@ -32,10 +30,10 @@ protected:
 		TSubclassOf<AHexTile> m_waterHexTile;
 
 public:	
-	// Sets default values for this actor's properties
-	AHexGridManager();
+	
+	static TArray<AHexTile*> HexGridArray;
 
-	friend class APlayerManager;
+	AHexGridManager();
 
 protected:
 	// Called when the game starts or when spawned
