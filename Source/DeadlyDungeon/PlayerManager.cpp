@@ -4,6 +4,7 @@
 #include "HexGridManager.h"
 #include "PlayerCharacter.h"
 
+APlayerCharacter* APlayerManager::m_selectedCharacter{};
 // Sets default values
 APlayerManager::APlayerManager()
 {
@@ -35,14 +36,20 @@ void APlayerManager::spawnPlayer(int hexIndex)
 	FRotator Rotation = GetActorRotation();
 	//FVector Location = GetActorLocation();
 	
-	
-	FVector Location = AHexGridManager::HexGridArray[hexIndex]->getLocation();
+	//Occupied
+	AHexGridManager::HexGridArray[hexIndex]->setOccupied(true);
 
+	FVector Location = AHexGridManager::HexGridArray[hexIndex]->getLocation();
+	Location += FVector(0, 0, 10.0);
 	APlayerCharacter* newPlayer = GetWorld()->SpawnActor<APlayerCharacter>
 		(m_playerCharacter, Location, Rotation);
 
 	
-	PlayerArray[numberOfPlayers++] = newPlayer;
-	
+	PlayerArray[numberOfPlayers++] = newPlayer;	
+}
+
+void APlayerManager::storeSelectedCharacter(APlayerCharacter* selectedCharacter)
+{
+	m_selectedCharacter = selectedCharacter;
 }
 

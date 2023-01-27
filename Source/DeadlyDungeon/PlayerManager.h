@@ -28,6 +28,8 @@ protected:
 
 	TArray<APlayerCharacter*> PlayerArray;
 
+	static APlayerCharacter* m_selectedCharacter;
+
 	int maxPlayers{ 100 };
 
 public:	
@@ -37,4 +39,5 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void spawnPlayer(int hexIndex);
 
+	void static storeSelectedCharacter(APlayerCharacter*);
 };

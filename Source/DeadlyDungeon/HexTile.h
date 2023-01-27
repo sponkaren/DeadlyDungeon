@@ -34,8 +34,8 @@ protected:
 
 	USceneComponent* m_rootComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
-		bool occupied;
+	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
+		bool m_occupied;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
 	FVector m_location;
@@ -62,4 +62,6 @@ public:
 	void setLocation(FVector);
 	
 	FVector getLocation();
+
+	void setOccupied(bool);
 };

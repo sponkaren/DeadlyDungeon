@@ -12,7 +12,7 @@ AHexTile::AHexTile()
 
 	m_location = FVector(0, 0, 0);
 
-	occupied = false;
+	m_occupied = false;
 }
 
 void AHexTile::setAxial(int r, int q)
@@ -39,4 +39,7 @@ FVector AHexTile::getLocation()
 	return m_location;
 }
 
-
+void AHexTile::setOccupied(bool occupied)
+{
+	m_occupied = occupied;
+}

@@ -38,6 +38,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 		FRotator charRotation {};
 
+	UPROPERTY(EditDefaultsOnly)
+		UAnimationAsset* m_idleAnim;
+
+	UPROPERTY(EditDefaultsOnly)
+		UAnimationAsset* m_selectedAnim;
+
+		static APlayerCharacter* m_lastClicked;
+
 
 public:	
 	// Called every frame
@@ -53,5 +61,9 @@ public:
 	void rotateToHex(const AHexTile&);
 	void moveToHex(const AHexTile&);
 
-	
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	void setSelectedCharacter();
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	void startIdling();
 };
