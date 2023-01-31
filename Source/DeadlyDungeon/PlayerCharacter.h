@@ -32,11 +32,11 @@ protected:
 
 	USceneComponent* m_rootComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-		AHexTile* hexLocation {};
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+		int m_hexLocationIndex {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-		FRotator charRotation {};
+		FRotator m_charRotation {};
 
 	UPROPERTY(EditDefaultsOnly)
 		UAnimationAsset* m_idleAnim;
@@ -56,10 +56,13 @@ public:
 	
 	APlayerCharacter();
 
-	void setLocation(AHexTile&);
+	void setLocation(int hexIndex);
 
-	void rotateToHex(const AHexTile&);
-	void moveToHex(const AHexTile&);
+	int getLocation();
+
+	void rotateToHex(AHexTile& hex);
+	
+	void moveToHex(FVector destinationHex);
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void setSelectedCharacter();

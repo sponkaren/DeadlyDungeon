@@ -2,6 +2,9 @@
 
 
 #include "HexGridManager.h"
+#include "PlayerCharacter.h"
+#include "PlayerManager.h"
+#include <cstdlib>
 #include <assert.h>
 
 TArray<AHexTile*> AHexGridManager::HexGridArray{};
@@ -70,4 +73,23 @@ void AHexGridManager::BeginPlay()
 
 		}
 	}
+}
+
+bool AHexGridManager::checkIfAdjacent(AHexTile* h1, AHexTile* h2)
+{
+	int diffR = std::abs(h1->getAxialR() - h2->getAxialR());
+	int diffQ = std::abs(h1->getAxialQ() - h2->getAxialQ());
+	int diffS = std::abs(h1->getAxialS() - h2->getAxialS());
+
+	return((diffR <= 1) && (diffQ <= 1) && (diffS <= 1));
+}
+
+bool AHexGridManager::validateMovement(int hexIndex)
+{	
+	if (checkIfAdjacent(HexGridArray[hexIndex], HexGridArray[APlayerManager::getSelectedCharacer()->getLocation()]))
+	{
+		return true;
+	}
+	else
+		return false;
 }

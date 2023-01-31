@@ -40,4 +40,8 @@ public:
 	void spawnPlayer(int hexIndex);
 
 	void static storeSelectedCharacter(APlayerCharacter*);
+
+	static APlayerCharacter* getSelectedCharacer();
+
+	static void movePlayerCharacter(int destinationHexIndex);
 };

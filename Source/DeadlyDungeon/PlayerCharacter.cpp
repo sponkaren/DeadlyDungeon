@@ -2,6 +2,8 @@
 
 #include "PlayerCharacter.h"
 #include "PlayerManager.h"
+#include "HexTile.h"
+#include <cassert>
 #include "Components/SkeletalMeshComponent.h"
 
 APlayerCharacter* APlayerCharacter::m_lastClicked{ nullptr };
@@ -31,19 +33,24 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
-void APlayerCharacter::setLocation(AHexTile& hex)
+void APlayerCharacter::setLocation(int hexIndex)
 {
-	hexLocation = &hex;
+	m_hexLocationIndex = hexIndex;
 }
 
-void APlayerCharacter::rotateToHex(const AHexTile& hex)
+int APlayerCharacter::getLocation()
+{
+	return m_hexLocationIndex;
+}
+
+void APlayerCharacter::rotateToHex(AHexTile& hex)
 {
 
 }
 
-void APlayerCharacter::moveToHex(const AHexTile& hex)
+void APlayerCharacter::moveToHex(FVector destinationHex)
 {
-
+	SetActorLocation(destinationHex);
 }
 
 void APlayerCharacter::setSelectedCharacter()

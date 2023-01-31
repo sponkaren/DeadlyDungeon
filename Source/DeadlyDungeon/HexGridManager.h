@@ -35,6 +35,11 @@ public:
 
 	AHexGridManager();
 
+	static bool checkIfAdjacent(AHexTile* h1, AHexTile* h2);
+
+	static bool validateMovement(int hexTileIndex);
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

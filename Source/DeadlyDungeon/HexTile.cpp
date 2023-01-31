@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "HexTile.h"
+#include "HexGridManager.h"
+#include "PlayerManager.h"
 #include "AxialPixelConversion.h"
 
 // Sets default values
@@ -20,6 +22,21 @@ void AHexTile::setAxial(int r, int q)
 	m_axialR = r;
 	m_axialQ = q;
 	m_axialS = -r - q;
+}
+
+int AHexTile::getAxialR()
+{
+	return m_axialR;
+}
+
+int AHexTile::getAxialQ()
+{
+	return m_axialQ;
+}
+
+int AHexTile::getAxialS()
+{
+	return m_axialS;
 }
 
 void AHexTile::setIndex(int i)
@@ -42,4 +59,20 @@ FVector AHexTile::getLocation()
 void AHexTile::setOccupied(bool occupied)
 {
 	m_occupied = occupied;
+}
+
+bool AHexTile::getOccupied()
+{
+	return m_occupied;
+}
+
+void AHexTile::moveToMe()
+{
+	if (m_occupied)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Occupied!"));
+	
+	else if (AHexGridManager::validateMovement(m_index))
+	{
+		APlayerManager::movePlayerCharacter(m_index);
+	}
 }

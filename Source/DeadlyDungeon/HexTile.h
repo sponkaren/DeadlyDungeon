@@ -57,6 +57,10 @@ public:
 	AHexTile();
 
 	void setAxial(int, int);
+	int getAxialR();
+	int getAxialQ();
+	int getAxialS();
+	
 	void setIndex(int);
 
 	void setLocation(FVector);
@@ -64,4 +68,8 @@ public:
 	FVector getLocation();
 
 	void setOccupied(bool);
+	bool getOccupied();
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	void moveToMe();
 };
