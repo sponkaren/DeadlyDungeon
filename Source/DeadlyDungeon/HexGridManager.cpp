@@ -86,7 +86,7 @@ bool AHexGridManager::checkIfAdjacent(AHexTile* h1, AHexTile* h2)
 
 bool AHexGridManager::validateMovement(int hexIndex)
 {	
-	if (checkIfAdjacent(HexGridArray[hexIndex], HexGridArray[APlayerManager::getSelectedCharacer()->getLocation()]))
+	if (checkIfAdjacent(HexGridArray[hexIndex], HexGridArray[APlayerManager::getSelectedCharacer()->getHexLocation()]))
 	{
 		return true;
 	}

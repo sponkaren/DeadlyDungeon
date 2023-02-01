@@ -76,3 +76,8 @@ void AHexTile::moveToMe()
 		APlayerManager::movePlayerCharacter(m_index);
 	}
 }
+
+AHexTile& AHexTile::getHex()
+{
+	return *this;
+}

@@ -42,7 +42,8 @@ void APlayerManager::spawnPlayer(int hexIndex)
 	APlayerCharacter* newPlayer = GetWorld()->SpawnActor<APlayerCharacter>
 		(m_playerCharacter, Location, Rotation);
 
-	newPlayer->setLocation(hexIndex);
+	newPlayer->setHexLocation(hexIndex);
+	newPlayer->setLocation(Location);
 
 	PlayerArray[numberOfPlayers++] = newPlayer;	
 }
@@ -61,12 +62,13 @@ void APlayerManager::movePlayerCharacter(int destIndex)
 {
 	if (m_selectedCharacter)
 	{
-		if (!AHexGridManager::HexGridArray[destIndex]->getOccupied())
+		if (!AHexGridManager::HexGridArray[destIndex]->getOccupied() && !m_selectedCharacter->getMoving())
 		{
-			AHexGridManager::HexGridArray[m_selectedCharacter->getLocation()]->setOccupied(false);
+			AHexGridManager::HexGridArray[m_selectedCharacter->getHexLocation()]->setOccupied(false);
 			AHexGridManager::HexGridArray[destIndex]->setOccupied(true);
-			m_selectedCharacter->moveToHex(AHexGridManager::HexGridArray[destIndex]->getLocation());
-			m_selectedCharacter->setLocation(destIndex);
+			FVector destination = AHexGridManager::HexGridArray[destIndex]->getLocation() + FVector(0, 0, 10.0);
+			m_selectedCharacter->moveToHex(destination);
+			m_selectedCharacter->setHexLocation(destIndex);
 		}
 	}
 }

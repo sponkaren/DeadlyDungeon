@@ -44,7 +44,27 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 		UAnimationAsset* m_selectedAnim;
 
+	UPROPERTY(EditDefaultsOnly)
+		UAnimationAsset* m_jumpAnim;
+
 		static APlayerCharacter* m_lastClicked;
+
+		bool m_isMoving{};
+
+		FVector m_origin{};
+
+		FVector m_destination{};
+
+		float m_timeElapsed{};
+
+		UPROPERTY(EditAnywhere, Category = "Movement")
+			float m_lerpDuration{};
+
+		UPROPERTY(EditAnywhere, Category = "Movement")
+			float m_waitTime{};
+
+		UPROPERTY(EditAnywhere, Category = "Movement")
+			float m_waitTime2{};
 
 
 public:	
@@ -56,11 +76,15 @@ public:
 	
 	APlayerCharacter();
 
-	void setLocation(int hexIndex);
+	void setHexLocation(int hexIndex);
 
-	int getLocation();
+	int getHexLocation();
 
-	void rotateToHex(AHexTile& hex);
+	void setLocation(FVector location);
+
+	bool getMoving();
+
+	void rotateTo(FVector location);
 	
 	void moveToHex(FVector destinationHex);
 

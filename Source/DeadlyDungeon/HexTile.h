@@ -72,4 +72,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void moveToMe();
+
+	AHexTile& getHex();
 };
