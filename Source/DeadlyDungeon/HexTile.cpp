@@ -10,10 +10,11 @@ AHexTile::AHexTile()
 {
 	m_rootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	m_tileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
+	m_tileHighlight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileHighlight"));
 	m_tileMesh->SetupAttachment(m_rootComponent);
-
+	m_tileHighlight->SetupAttachment(m_rootComponent);
 	m_location = FVector(0, 0, 0);
-
+	setHighightVisible(false);
 	m_occupied = false;
 }
 
@@ -76,6 +77,13 @@ void AHexTile::moveToMe()
 		APlayerManager::movePlayerCharacter(m_index);
 	}
 }
+
+
+void AHexTile::setHighightVisible(bool on)
+{
+	m_tileHighlight->SetVisibility(on);
+}
+
 
 AHexTile& AHexTile::getHex()
 {

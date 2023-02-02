@@ -32,6 +32,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
 		UStaticMeshComponent* m_tileMesh;
 
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
+		UStaticMeshComponent* m_tileHighlight;
+
 	USceneComponent* m_rootComponent;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
@@ -72,6 +76,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void moveToMe();
+
+	void setHighightVisible(bool on);
 
 	AHexTile& getHex();
 };
