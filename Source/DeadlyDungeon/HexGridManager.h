@@ -39,6 +39,10 @@ public:
 
 	static bool validateMovement(int hexTileIndex);
 
+	static void highlightTiles(int hexIndex);
+
+	static void highlightsOff();
+
 
 protected:
 	// Called when the game starts or when spawned

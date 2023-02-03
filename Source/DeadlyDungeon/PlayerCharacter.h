@@ -8,12 +8,20 @@
 #include "PlayerCharacter.generated.h"
 
 UENUM()
-enum class PlayerCharacterType : uint8
+enum class PlayerCharacterClass : uint8
 {
 	OTTO,
 	WARRIOR,
 	MAGE,
 	MAX UMETA(Hidden)
+};
+
+UENUM()
+enum class CharacterType : uint8
+{
+	ALLY, 
+	ENEMY,
+	MAX UMETA (Hidden)
 };
 
 UCLASS()
@@ -25,7 +33,10 @@ class DEADLYDUNGEON_API APlayerCharacter : public APawn
 protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-		PlayerCharacterType m_playerCharacterType;
+		PlayerCharacterClass m_playerCharacterClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
+		CharacterType m_type;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 		USkeletalMeshComponent* m_playerCharacterMesh;

@@ -13,7 +13,6 @@ APlayerManager::APlayerManager()
 	PrimaryActorTick.bCanEverTick = false;
 	PlayerArray.SetNumZeroed(maxPlayers);
 	m_selectedCharacter = nullptr;
-
 }
 
 // Called when the game starts or when spawned
@@ -29,8 +28,17 @@ void APlayerManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);	
 }
 
-void APlayerManager::spawnPlayer(int hexIndex)
+void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 {	
+	if (enemy)
+	{
+		m_characterToSpawn = m_enemyCharacter;
+	}
+	else
+	{
+		m_characterToSpawn = m_playerCharacter;
+	}
+
 	FRotator Rotation = GetActorRotation();
 	//FVector Location = GetActorLocation();
 	
@@ -40,7 +48,7 @@ void APlayerManager::spawnPlayer(int hexIndex)
 	FVector Location = AHexGridManager::HexGridArray[hexIndex]->getLocation();
 	Location += FVector(0, 0, 10.0);
 	APlayerCharacter* newPlayer = GetWorld()->SpawnActor<APlayerCharacter>
-		(m_playerCharacter, Location, Rotation);
+		(m_characterToSpawn, Location, Rotation);
 
 	newPlayer->setHexLocation(hexIndex);
 	newPlayer->setLocation(Location);
@@ -66,6 +74,7 @@ void APlayerManager::movePlayerCharacter(int destIndex)
 		{
 			AHexGridManager::HexGridArray[m_selectedCharacter->getHexLocation()]->setOccupied(false);
 			AHexGridManager::HexGridArray[destIndex]->setOccupied(true);
+			AHexGridManager::highlightsOff();
 			FVector destination = AHexGridManager::HexGridArray[destIndex]->getLocation() + FVector(0, 0, 10.0);
 			m_selectedCharacter->moveToHex(destination);
 			m_selectedCharacter->setHexLocation(destIndex);

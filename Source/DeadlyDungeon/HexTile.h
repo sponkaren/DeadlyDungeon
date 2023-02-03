@@ -33,7 +33,7 @@ protected:
 		UStaticMeshComponent* m_tileMesh;
 
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
+	UPROPERTY(BlueprintReadWrite, Category = "Tile")
 		UStaticMeshComponent* m_tileHighlight;
 
 	USceneComponent* m_rootComponent;
@@ -60,7 +60,7 @@ public:
 	// Sets default values for this actor's properties
 	AHexTile();
 
-	void setAxial(int, int);
+	void setAxial(int r, int q);
 	int getAxialR();
 	int getAxialQ();
 	int getAxialS();

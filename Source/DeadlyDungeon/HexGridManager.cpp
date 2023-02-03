@@ -93,3 +93,24 @@ bool AHexGridManager::validateMovement(int hexIndex)
 	else
 		return false;
 }
+
+void AHexGridManager::highlightTiles(int hexIndex) 
+{
+	for (AHexTile* hex : HexGridArray)
+	{
+		if (checkIfAdjacent(hex, HexGridArray[hexIndex])
+			&& hex != HexGridArray[hexIndex]
+			&& !hex->getOccupied())
+		{
+			hex->setHighightVisible(true);
+		}
+	}
+}
+
+void AHexGridManager::highlightsOff()
+{
+	for (AHexTile* hex : HexGridArray)
+	{
+		hex->setHighightVisible(false);
+	}
+}

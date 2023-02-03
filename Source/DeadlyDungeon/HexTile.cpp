@@ -14,7 +14,6 @@ AHexTile::AHexTile()
 	m_tileMesh->SetupAttachment(m_rootComponent);
 	m_tileHighlight->SetupAttachment(m_rootComponent);
 	m_location = FVector(0, 0, 0);
-	setHighightVisible(false);
 	m_occupied = false;
 }
 
@@ -69,7 +68,11 @@ bool AHexTile::getOccupied()
 
 void AHexTile::moveToMe()
 {
-	if (m_occupied)
+	if (!APlayerManager::getSelectedCharacer())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No selected character"));
+	}
+	else if (m_occupied)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Occupied!"));
 	
 	else if (AHexGridManager::validateMovement(m_index))
@@ -81,7 +84,7 @@ void AHexTile::moveToMe()
 
 void AHexTile::setHighightVisible(bool on)
 {
-	m_tileHighlight->SetVisibility(on);
+	m_tileHighlight->SetVisibility(on, true);
 }
 
 

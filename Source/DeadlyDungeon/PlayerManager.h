@@ -24,7 +24,13 @@ protected:
 		int numberOfPlayers;
 
 	UPROPERTY(EditAnywhere, Category = "Player Management")
+		TSubclassOf<APlayerCharacter> m_characterToSpawn;
+
+	UPROPERTY(EditAnywhere, Category = "Player Management")
 		TSubclassOf<APlayerCharacter> m_playerCharacter;
+
+	UPROPERTY(EditAnywhere, Category = "Player Management")
+		TSubclassOf<APlayerCharacter> m_enemyCharacter;
 
 	TArray<APlayerCharacter*> PlayerArray;
 
@@ -37,7 +43,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
-	void spawnPlayer(int hexIndex);
+	void spawnPlayer(int hexIndex, bool enemy);
 
 	void static storeSelectedCharacter(APlayerCharacter*);
 

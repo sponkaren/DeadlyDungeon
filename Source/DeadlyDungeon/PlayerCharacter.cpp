@@ -3,6 +3,7 @@
 #include "PlayerCharacter.h"
 #include "PlayerManager.h"
 #include "HexTile.h"
+#include "HexGridManager.h"
 #include <cassert>
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -40,7 +41,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		
 		if (m_waitTime > 0)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Waiting!"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Waiting!"));
 			m_waitTime -= DeltaTime;
 			return;
 		}		
@@ -56,7 +57,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 		else if (m_waitTime2 > 0)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Waiting again!"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Waiting again!"));
 			m_waitTime2 -= DeltaTime;
 			return;
 		}
@@ -70,7 +71,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Stop moving!"));
 			m_isMoving = false;
 			m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_selectedAnim, true);
-			setLocation(m_destination);			
+			setLocation(m_destination);
+			setSelectedCharacter();
 		}
 	}
 }
@@ -123,12 +125,14 @@ void APlayerCharacter::setSelectedCharacter()
 	if (IsValid(m_lastClicked))
 	{
 		m_lastClicked->startIdling();
+		AHexGridManager::highlightsOff();
 	}
 
 	m_lastClicked = this;
 
 	m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_selectedAnim, true);
 	APlayerManager::storeSelectedCharacter(m_lastClicked);
+	AHexGridManager::highlightTiles(getHexLocation());
 
 }
 
