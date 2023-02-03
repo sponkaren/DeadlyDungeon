@@ -32,6 +32,11 @@ class DEADLYDUNGEON_API APlayerCharacter : public APawn
 
 protected:
 
+	//STATS!!!
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+		int m_initiative{};
+
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 		PlayerCharacterClass m_playerCharacterClass;
 
@@ -40,6 +45,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 		USkeletalMeshComponent* m_playerCharacterMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
+		UStaticMeshComponent* m_arrowMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
+		
 
 	USceneComponent* m_rootComponent;
 
@@ -78,6 +89,9 @@ protected:
 			float m_waitTime2{};
 
 
+
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -104,4 +118,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void startIdling();
+
+	void setArrowOn(bool on);
+
+	int getInitiative();
+
+	FORCEINLINE bool operator<(const APlayerCharacter& Other) const;
 };

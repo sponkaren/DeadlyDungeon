@@ -18,13 +18,18 @@ APlayerCharacter::APlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	m_rootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	m_playerCharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	m_arrowMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArrowMesh"));
 	m_playerCharacterMesh->SetupAttachment(m_rootComponent);
+	m_arrowMesh->SetupAttachment(m_rootComponent);
 	m_lastClicked = nullptr;
 	m_isMoving = false;
 	m_timeElapsed = 0;
 	m_lerpDuration = baseWait;
 	m_waitTime = baseWait;
 	m_waitTime2 = baseWait;
+
+	//Stats
+	m_initiative = FMath::RandRange(1, 9);
 }
 
 
@@ -125,11 +130,11 @@ void APlayerCharacter::setSelectedCharacter()
 	if (IsValid(m_lastClicked))
 	{
 		m_lastClicked->startIdling();
+		m_lastClicked->setArrowOn(false);
 		AHexGridManager::highlightsOff();
 	}
-
 	m_lastClicked = this;
-
+	setArrowOn(true);
 	m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_selectedAnim, true);
 	APlayerManager::storeSelectedCharacter(m_lastClicked);
 	AHexGridManager::highlightTiles(getHexLocation());
@@ -139,4 +144,19 @@ void APlayerCharacter::setSelectedCharacter()
 void APlayerCharacter::startIdling()
 {
 	m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_idleAnim, true);
+}
+
+void APlayerCharacter::setArrowOn(bool on)
+{
+	m_arrowMesh->SetVisibility(on, true);
+}
+
+int APlayerCharacter::getInitiative()
+{
+	return m_initiative;
+}
+
+bool APlayerCharacter::operator<(const APlayerCharacter& Other) const
+{
+	return m_initiative > Other.m_initiative;
 }

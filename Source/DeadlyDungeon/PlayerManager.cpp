@@ -1,17 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PlayerManager.h"
+#include <algorithm>
 #include "HexGridManager.h"
 #include "HexTile.h"
 #include "PlayerCharacter.h"
 
 APlayerCharacter* APlayerManager::m_selectedCharacter{};
+TArray<APlayerCharacter*> APlayerManager::CharacterArray{};
 // Sets default values
 APlayerManager::APlayerManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	PlayerArray.SetNumZeroed(maxPlayers);
+	//CharacterArray.SetNumZeroed(maxPlayers);
 	m_selectedCharacter = nullptr;
 }
 
@@ -53,7 +55,8 @@ void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 	newPlayer->setHexLocation(hexIndex);
 	newPlayer->setLocation(Location);
 
-	PlayerArray[numberOfPlayers++] = newPlayer;	
+
+	CharacterArray[numberOfCharacters++] = newPlayer;
 }
 
 void APlayerManager::storeSelectedCharacter(APlayerCharacter* selectedCharacter)
@@ -80,4 +83,16 @@ void APlayerManager::movePlayerCharacter(int destIndex)
 			m_selectedCharacter->setHexLocation(destIndex);
 		}
 	}
+}
+
+bool greaterInitiative(APlayerCharacter& c1, APlayerCharacter& c2)
+{
+	return (c1.getInitiative() < c2.getInitiative());
+}
+
+void APlayerManager::sortByInitiative()
+{
+	CharacterArray.Sort();
+
+	CharacterArray[0]->setSelectedCharacter();
 }

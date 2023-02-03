@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category = "Player Management")
-		int numberOfPlayers;
+		int numberOfCharacters;
 
 	UPROPERTY(EditAnywhere, Category = "Player Management")
 		TSubclassOf<APlayerCharacter> m_characterToSpawn;
@@ -32,7 +32,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Player Management")
 		TSubclassOf<APlayerCharacter> m_enemyCharacter;
 
-	TArray<APlayerCharacter*> PlayerArray;
+	static TArray<APlayerCharacter*> CharacterArray;
 
 	static APlayerCharacter* m_selectedCharacter;
 
@@ -50,4 +50,9 @@ public:
 	static APlayerCharacter* getSelectedCharacer();
 
 	static void movePlayerCharacter(int destinationHexIndex);
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+		static void sortByInitiative();
+
+	bool greaterInitiative(APlayerCharacter& c1, APlayerCharacter& c2);
 };
