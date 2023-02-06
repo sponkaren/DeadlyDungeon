@@ -4,17 +4,21 @@
 #include <algorithm>
 #include "HexGridManager.h"
 #include "HexTile.h"
+#include <array>
 #include "PlayerCharacter.h"
 
 APlayerCharacter* APlayerManager::m_selectedCharacter{};
 TArray<APlayerCharacter*> APlayerManager::CharacterArray{};
+int APlayerManager::turnIndex{};
+
 // Sets default values
 APlayerManager::APlayerManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	//CharacterArray.SetNumZeroed(maxPlayers);
 	m_selectedCharacter = nullptr;
+	numberOfCharacters = 0 ;
+	turnIndex = 0;
 }
 
 // Called when the game starts or when spawned
@@ -32,6 +36,9 @@ void APlayerManager::Tick(float DeltaTime)
 
 void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 {	
+
+	CharacterArray.SetNum(numberOfCharacters+1);
+
 	if (enemy)
 	{
 		m_characterToSpawn = m_enemyCharacter;
@@ -55,7 +62,6 @@ void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 	newPlayer->setHexLocation(hexIndex);
 	newPlayer->setLocation(Location);
 
-
 	CharacterArray[numberOfCharacters++] = newPlayer;
 }
 
@@ -71,7 +77,7 @@ APlayerCharacter* APlayerManager::getSelectedCharacer()
 
 void APlayerManager::movePlayerCharacter(int destIndex)
 {
-	if (m_selectedCharacter)
+	if (m_selectedCharacter && m_selectedCharacter->getMovementLeft()>0)
 	{
 		if (!AHexGridManager::HexGridArray[destIndex]->getOccupied() && !m_selectedCharacter->getMoving())
 		{
@@ -90,9 +96,31 @@ bool greaterInitiative(APlayerCharacter& c1, APlayerCharacter& c2)
 	return (c1.getInitiative() < c2.getInitiative());
 }
 
+int APlayerManager::getnextTurn()
+{			
+	return turnIndex;
+}
+
 void APlayerManager::sortByInitiative()
 {
 	CharacterArray.Sort();
 
-	CharacterArray[0]->setSelectedCharacter();
+	CharacterArray[turnIndex]->setSelectedCharacter();
+} 
+
+void APlayerManager::setNextTurn()
+{
+	if (!m_selectedCharacter->getMoving())
+	{
+
+		if (turnIndex < CharacterArray.Num() - 1)
+		{
+			CharacterArray[++turnIndex]->setSelectedCharacter();
+		}
+		else
+		{
+			turnIndex = 0;
+			CharacterArray[turnIndex]->setSelectedCharacter();
+		}
+	}
 }

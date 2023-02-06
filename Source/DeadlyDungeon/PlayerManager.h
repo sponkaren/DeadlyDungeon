@@ -38,6 +38,8 @@ protected:
 
 	int maxPlayers{ 100 };
 
+	static int turnIndex;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -54,5 +56,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 		static void sortByInitiative();
 
+	static int getnextTurn();
+
 	bool greaterInitiative(APlayerCharacter& c1, APlayerCharacter& c2);
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	void setNextTurn();
 };

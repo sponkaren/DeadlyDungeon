@@ -36,6 +36,12 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 		int m_initiative{};
 
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+		int m_movement{};
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+		int m_movementLeft{};
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 		PlayerCharacterClass m_playerCharacterClass;
@@ -123,5 +129,10 @@ public:
 
 	int getInitiative();
 
+	int getMovementLeft();
+
+	void resetMovement();
+
 	FORCEINLINE bool operator<(const APlayerCharacter& Other) const;
+
 };

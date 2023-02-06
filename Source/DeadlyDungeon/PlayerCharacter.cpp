@@ -30,6 +30,8 @@ APlayerCharacter::APlayerCharacter()
 
 	//Stats
 	m_initiative = FMath::RandRange(1, 9);
+	m_movement = 3;
+	resetMovement();
 }
 
 
@@ -77,7 +79,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 			m_isMoving = false;
 			m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_selectedAnim, true);
 			setLocation(m_destination);
-			setSelectedCharacter();
+			if (m_movementLeft > 0)
+			{
+				m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_selectedAnim, true);
+				AHexGridManager::highlightTiles(getHexLocation());
+			}
+			else
+			{
+				startIdling();
+			}
 		}
 	}
 }
@@ -117,12 +127,16 @@ void APlayerCharacter::rotateTo(FVector destination)
 
 void APlayerCharacter::moveToHex(FVector destinationHex)
 {	
-	rotateTo(destinationHex);
-	m_destination = destinationHex;
-	m_isMoving = true;
-	m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_jumpAnim, false);
+	if (m_movementLeft > 0)
+	{
+		m_movementLeft -= 1;
+		rotateTo(destinationHex);
+		m_destination = destinationHex;
+		m_isMoving = true;
+		m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_jumpAnim, false);
 
-	//SetActorLocation(destinationHex);
+		//SetActorLocation(destinationHex);
+	}
 }
 
 void APlayerCharacter::setSelectedCharacter()
@@ -135,6 +149,7 @@ void APlayerCharacter::setSelectedCharacter()
 	}
 	m_lastClicked = this;
 	setArrowOn(true);
+	resetMovement();
 	m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_selectedAnim, true);
 	APlayerManager::storeSelectedCharacter(m_lastClicked);
 	AHexGridManager::highlightTiles(getHexLocation());
@@ -154,6 +169,16 @@ void APlayerCharacter::setArrowOn(bool on)
 int APlayerCharacter::getInitiative()
 {
 	return m_initiative;
+}
+
+int APlayerCharacter::getMovementLeft()
+{
+	return m_movementLeft;
+}
+
+void APlayerCharacter::resetMovement()
+{
+	m_movementLeft = m_movement;
 }
 
 bool APlayerCharacter::operator<(const APlayerCharacter& Other) const
