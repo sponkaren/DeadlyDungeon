@@ -53,6 +53,10 @@ public:
 
 	static void movePlayerCharacter(int destinationHexIndex);
 
+	static void occupiedHexClicked(int hexIndex);
+
+	static void characterClicked(APlayerCharacter& character);
+
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 		static void sortByInitiative();
 
@@ -62,4 +66,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void setNextTurn();
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	void setAttacking();
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+		void setIdle();
 };

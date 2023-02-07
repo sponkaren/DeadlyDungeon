@@ -11,8 +11,10 @@ AHexTile::AHexTile()
 	m_rootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	m_tileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
 	m_tileHighlight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileHighlight"));
+	m_tileAttackHighlight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileAttackHighlight"));
 	m_tileMesh->SetupAttachment(m_rootComponent);
 	m_tileHighlight->SetupAttachment(m_rootComponent);
+	m_tileAttackHighlight->SetupAttachment(m_rootComponent);
 	m_location = FVector(0, 0, 0);
 	m_occupied = false;
 }
@@ -66,18 +68,24 @@ bool AHexTile::getOccupied()
 	return m_occupied;
 }
 
-void AHexTile::moveToMe()
+void AHexTile::hexClicked()
 {
+
 	if (!APlayerManager::getSelectedCharacer())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No selected character"));
 	}
-	else if (m_occupied)
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Occupied!"));
 	
 	else if (AHexGridManager::validateMovement(m_index))
 	{
-		APlayerManager::movePlayerCharacter(m_index);
+		if (!m_occupied)
+		{		
+			APlayerManager::movePlayerCharacter(m_index);
+		}
+		else if (m_occupied)
+		{
+			APlayerManager::occupiedHexClicked(m_index);
+		}
 	}
 }
 
@@ -87,6 +95,10 @@ void AHexTile::setHighightVisible(bool on)
 	m_tileHighlight->SetVisibility(on, true);
 }
 
+void AHexTile::setAttackHighightVisible(bool on)
+{
+	m_tileAttackHighlight->SetVisibility(on, true);
+}
 
 AHexTile& AHexTile::getHex()
 {

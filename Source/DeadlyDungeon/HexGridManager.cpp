@@ -81,11 +81,26 @@ bool AHexGridManager::checkIfAdjacent(AHexTile* h1, AHexTile* h2)
 	int diffQ = std::abs(h1->getAxialQ() - h2->getAxialQ());
 	int diffS = std::abs(h1->getAxialS() - h2->getAxialS());
 
+	if (diffR == 0 && diffQ == 0 && diffS == 0)
+	{
+		return false;
+	}
+
 	return((diffR <= 1) && (diffQ <= 1) && (diffS <= 1));
 }
 
 bool AHexGridManager::validateMovement(int hexIndex)
 {	
+	if (checkIfAdjacent(HexGridArray[hexIndex], HexGridArray[APlayerManager::getSelectedCharacer()->getHexLocation()]))
+	{
+		return true;
+	}
+	else
+		return false;
+}
+
+bool AHexGridManager::validateAttack(int hexIndex)
+{
 	if (checkIfAdjacent(HexGridArray[hexIndex], HexGridArray[APlayerManager::getSelectedCharacer()->getHexLocation()]))
 	{
 		return true;
@@ -107,10 +122,24 @@ void AHexGridManager::highlightTiles(int hexIndex)
 	}
 }
 
+void AHexGridManager::highlightAttackTiles(int hexIndex)
+{
+	for (AHexTile* hex : HexGridArray)
+	{
+		if (checkIfAdjacent(hex, HexGridArray[hexIndex])
+			&& hex != HexGridArray[hexIndex]
+			&& hex->getOccupied())
+		{
+			hex->setAttackHighightVisible(true);
+		}
+	}
+}
+
 void AHexGridManager::highlightsOff()
 {
 	for (AHexTile* hex : HexGridArray)
 	{
 		hex->setHighightVisible(false);
+		hex->setAttackHighightVisible(false);
 	}
 }

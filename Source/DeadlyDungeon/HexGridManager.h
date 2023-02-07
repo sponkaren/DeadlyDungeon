@@ -39,7 +39,11 @@ public:
 
 	static bool validateMovement(int hexTileIndex);
 
+	static bool validateAttack(int hexTileIndex);
+
 	static void highlightTiles(int hexIndex);
+
+	static void highlightAttackTiles(int hexIndex);
 
 	static void highlightsOff();
 

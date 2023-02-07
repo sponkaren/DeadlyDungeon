@@ -79,7 +79,8 @@ void APlayerManager::movePlayerCharacter(int destIndex)
 {
 	if (m_selectedCharacter && m_selectedCharacter->getMovementLeft()>0)
 	{
-		if (!AHexGridManager::HexGridArray[destIndex]->getOccupied() && !m_selectedCharacter->getMoving())
+		
+		if (!AHexGridManager::HexGridArray[destIndex]->getOccupied() && m_selectedCharacter->isIdle())
 		{
 			AHexGridManager::HexGridArray[m_selectedCharacter->getHexLocation()]->setOccupied(false);
 			AHexGridManager::HexGridArray[destIndex]->setOccupied(true);
@@ -90,6 +91,28 @@ void APlayerManager::movePlayerCharacter(int destIndex)
 		}
 	}
 }
+
+void APlayerManager::occupiedHexClicked(int hexIndex)
+{
+	if (!m_selectedCharacter->getAttacking())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Occupied!"));
+	}
+}
+
+void APlayerManager::characterClicked(APlayerCharacter& character)
+{
+	if (m_selectedCharacter->getAttacking())
+	{
+		if (AHexGridManager::validateAttack(character.getHexLocation()))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Attack!"));
+			m_selectedCharacter->rotateTo(character.getLocation());
+			character.updateHealth(true, m_selectedCharacter->getAttack());
+		}
+	}
+}
+
 
 bool greaterInitiative(APlayerCharacter& c1, APlayerCharacter& c2)
 {
@@ -112,7 +135,6 @@ void APlayerManager::setNextTurn()
 {
 	if (!m_selectedCharacter->getMoving())
 	{
-
 		if (turnIndex < CharacterArray.Num() - 1)
 		{
 			CharacterArray[++turnIndex]->setSelectedCharacter();
@@ -122,5 +144,22 @@ void APlayerManager::setNextTurn()
 			turnIndex = 0;
 			CharacterArray[turnIndex]->setSelectedCharacter();
 		}
+	}
+}
+
+void APlayerManager::setAttacking()
+{
+	if (m_selectedCharacter)
+	{
+		AHexGridManager::highlightsOff();
+		m_selectedCharacter->setAttacking();			
+	}	
+}
+
+void APlayerManager::setIdle()
+{
+	if (m_selectedCharacter)
+	{
+		m_selectedCharacter->startIdling();	
 	}
 }

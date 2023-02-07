@@ -32,6 +32,15 @@ class DEADLYDUNGEON_API APlayerCharacter : public APawn
 
 protected:
 
+	enum e_state
+	{
+		IDLE, 
+		MOVING,
+		ATTACKING,		
+	};
+
+	e_state m_state;
+
 	//STATS!!!
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 		int m_initiative{};
@@ -42,6 +51,14 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 		int m_movementLeft{};
 
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+		float m_attack{};
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+		float m_maxHealth{};
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+		float m_currentHealth{};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 		PlayerCharacterClass m_playerCharacterClass;
@@ -75,9 +92,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 		UAnimationAsset* m_jumpAnim;
 
+	UPROPERTY(EditDefaultsOnly)
+		UAnimationAsset* m_attackAnim;
+
 		static APlayerCharacter* m_lastClicked;
 
-		bool m_isMoving{};
+		//bool m_isMoving{};
 
 		FVector m_origin{};
 
@@ -111,9 +131,21 @@ public:
 
 	int getHexLocation();
 
+	FVector getLocation();
+
 	void setLocation(FVector location);
 
+	e_state getState();
+
+	void setAttacking();
+
+	bool getAttacking();
+
+	float getAttack();
+
 	bool getMoving();
+
+	bool isIdle();
 
 	void rotateTo(FVector location);
 	
@@ -131,8 +163,24 @@ public:
 
 	int getMovementLeft();
 
+	void setMovementLeft(int movement);
+
 	void resetMovement();
+	
+	void resetHealth();
+
+	void updateHealth(bool damage, float delta);
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	float getCurrentHealth();
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+		float getCurrentHealthPercent();
 
 	FORCEINLINE bool operator<(const APlayerCharacter& Other) const;
 
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+		void characterClicked();
+
+	APlayerCharacter& getCharacter();
 };
