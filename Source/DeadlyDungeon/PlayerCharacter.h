@@ -171,6 +171,8 @@ public:
 
 	void updateHealth(bool damage, float delta);
 
+	void killMe();
+
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	float getCurrentHealth();
 

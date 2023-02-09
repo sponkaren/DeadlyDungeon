@@ -235,6 +235,11 @@ void APlayerCharacter::updateHealth(bool damage, float delta)
 	if (damage)
 	{
 		m_currentHealth -= delta;
+
+		if (m_currentHealth <= 0)
+		{
+			m_playerCharacterMesh->SetSimulatePhysics(true);
+		}
 	}
 	else
 	{
@@ -260,6 +265,12 @@ bool APlayerCharacter::operator<(const APlayerCharacter& Other) const
 void APlayerCharacter::characterClicked()
 {
 	APlayerManager::characterClicked(getCharacter());
+}
+
+void APlayerCharacter::killMe()
+{
+	m_playerCharacterMesh->SetSimulatePhysics(true);
+
 }
 
 APlayerCharacter& APlayerCharacter::getCharacter()
