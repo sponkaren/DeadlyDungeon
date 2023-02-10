@@ -78,6 +78,9 @@ protected:
 	USceneComponent* m_rootComponent;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+		int m_index{};
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 		int m_hexLocationIndex {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
@@ -94,6 +97,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 		UAnimationAsset* m_attackAnim;
+
+	UPROPERTY(EditDefaultsOnly)
+		UAnimationAsset* m_TPose;
 
 		static APlayerCharacter* m_lastClicked;
 
@@ -127,6 +133,10 @@ public:
 	
 	APlayerCharacter();
 
+	void setIndex(int index);
+
+	int getIndex();
+
 	void setHexLocation(int hexIndex);
 
 	int getHexLocation();
@@ -137,7 +147,11 @@ public:
 
 	e_state getState();
 
-	void setAttacking();
+	void setEnemy(bool enemy);
+
+	bool isEnemy();
+
+	bool setAttacking();
 
 	bool getAttacking();
 
@@ -172,6 +186,8 @@ public:
 	void updateHealth(bool damage, float delta);
 
 	void killMe();
+
+	bool isPlayer();
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	float getCurrentHealth();

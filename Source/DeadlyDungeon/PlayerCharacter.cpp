@@ -8,6 +8,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/PrimitiveComponent.h"
 
 APlayerCharacter* APlayerCharacter::m_lastClicked{ nullptr };
 constexpr float baseWait{ 0.5 };
@@ -26,7 +27,9 @@ APlayerCharacter::APlayerCharacter()
 	m_lerpDuration = baseWait;
 	m_waitTime = baseWait;
 	m_waitTime2 = baseWait;
+	m_index = 999;
 	m_state = IDLE;
+	m_type = CharacterType::ALLY;
 
 	//Stats
 	m_initiative = FMath::RandRange(1, 9);
@@ -77,8 +80,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 			m_timeElapsed = 0;
 			m_lerpDuration = baseWait;
 			m_waitTime = baseWait;
-			m_waitTime2 = baseWait;
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Stop moving!"));			
+			m_waitTime2 = baseWait;			
 			m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_selectedAnim, true);
 			setLocation(m_destination);
 			startIdling();
@@ -91,6 +93,16 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void APlayerCharacter::setIndex(int index)
+{
+	m_index = index;
+}
+
+int APlayerCharacter::getIndex()
+{
+	return m_index;
 }
 
 void APlayerCharacter::setHexLocation(int hexIndex)
@@ -118,11 +130,42 @@ APlayerCharacter::e_state APlayerCharacter::getState()
 	return m_state;
 }
 
-void APlayerCharacter::setAttacking()
+void APlayerCharacter::setEnemy(bool enemy)
 {
-	m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_attackAnim, true);
-	m_state = ATTACKING;
-	AHexGridManager::highlightAttackTiles(getHexLocation());
+	if (enemy)
+	{
+		m_type = CharacterType::ENEMY;
+	}
+	else
+	{
+		m_type = CharacterType::ALLY;
+	}
+}
+
+bool APlayerCharacter::isEnemy()
+{
+	return m_type == CharacterType::ENEMY;
+}
+
+bool APlayerCharacter::setAttacking()
+{
+	if (m_state == IDLE)
+	{
+		m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_attackAnim, true);
+		m_state = ATTACKING;
+		AHexGridManager::highlightsOff();
+		AHexGridManager::highlightAttackTiles(getHexLocation());
+		return true;
+	}
+	else if (m_state == MOVING)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Can't attack! Still moving!"));
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 bool APlayerCharacter::getAttacking()
@@ -238,7 +281,7 @@ void APlayerCharacter::updateHealth(bool damage, float delta)
 
 		if (m_currentHealth <= 0)
 		{
-			m_playerCharacterMesh->SetSimulatePhysics(true);
+			killMe();
 		}
 	}
 	else
@@ -257,6 +300,7 @@ float APlayerCharacter::getCurrentHealthPercent()
 	return m_currentHealth/m_maxHealth;
 }
 
+
 bool APlayerCharacter::operator<(const APlayerCharacter& Other) const
 {
 	return m_initiative > Other.m_initiative;
@@ -264,13 +308,25 @@ bool APlayerCharacter::operator<(const APlayerCharacter& Other) const
 
 void APlayerCharacter::characterClicked()
 {
-	APlayerManager::characterClicked(getCharacter());
+	if (m_currentHealth > 0)
+	{
+		APlayerManager::characterClicked(getCharacter());
+	}
 }
 
 void APlayerCharacter::killMe()
 {
+	m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_TPose, true);
 	m_playerCharacterMesh->SetSimulatePhysics(true);
+	
+	FRotator rotation{ UKismetMathLibrary::FindLookAtRotation(m_origin, APlayerManager::getSelectedCharacer()->getLocation()) };
 
+	FVector impulse{ rotation.Vector() * -5000 };
+	m_playerCharacterMesh->AddImpulse(impulse,"", true);
+	AHexGridManager::HexGridArray[m_hexLocationIndex]->setAttackHighightVisible(false);
+	AHexGridManager::HexGridArray[m_hexLocationIndex]->setOccupied(false);
+
+	APlayerManager::removeCharacter(getCharacter());
 }
 
 APlayerCharacter& APlayerCharacter::getCharacter()

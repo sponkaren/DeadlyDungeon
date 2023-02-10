@@ -20,8 +20,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = "Player Management")
-		int numberOfCharacters;
+	static int numberOfCharacters;
 
 	UPROPERTY(EditAnywhere, Category = "Player Management")
 		TSubclassOf<APlayerCharacter> m_characterToSpawn;
@@ -57,18 +56,22 @@ public:
 
 	static void characterClicked(APlayerCharacter& character);
 
+	static void removeCharacter(APlayerCharacter& character);
+
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 		static void sortByInitiative();
 
+	static void setIndexes();
+
 	static int getnextTurn();
 
-	bool greaterInitiative(APlayerCharacter& c1, APlayerCharacter& c2);
-
+	static void checkGameOver();
+	
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void setNextTurn();
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
-	void setAttacking();
+	bool setAttacking();
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 		void setIdle();

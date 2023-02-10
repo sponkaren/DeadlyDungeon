@@ -44,7 +44,7 @@ void AHexGridManager::BeginPlay()
 	
 	for (int tileNumber{ 0 }; tileNumber < numberOfTiles; tileNumber++)
 	{
-		TSubclassOf<AHexTile> tileToSpawn = m_grassHexTile;
+		TSubclassOf<AHexTile> tileToSpawn = m_waterHexTile;
 		FVector Location = AxialPixelConversion::axialToPixel(r, q);
 		
 		AHexTile* newTile = GetWorld()->SpawnActor<AHexTile>
@@ -124,6 +124,7 @@ void AHexGridManager::highlightTiles(int hexIndex)
 
 void AHexGridManager::highlightAttackTiles(int hexIndex)
 {
+	
 	for (AHexTile* hex : HexGridArray)
 	{
 		if (checkIfAdjacent(hex, HexGridArray[hexIndex])

@@ -4,12 +4,14 @@
 #include <algorithm>
 #include "HexGridManager.h"
 #include "HexTile.h"
+#include "GameManager.h"
 #include <array>
 #include "PlayerCharacter.h"
 
 APlayerCharacter* APlayerManager::m_selectedCharacter{};
 TArray<APlayerCharacter*> APlayerManager::CharacterArray{};
 int APlayerManager::turnIndex{};
+int APlayerManager::numberOfCharacters{};
 
 // Sets default values
 APlayerManager::APlayerManager()
@@ -61,7 +63,7 @@ void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 
 	newPlayer->setHexLocation(hexIndex);
 	newPlayer->setLocation(Location);
-
+	newPlayer->setEnemy(enemy);
 	CharacterArray[numberOfCharacters++] = newPlayer;
 }
 
@@ -114,9 +116,12 @@ void APlayerManager::characterClicked(APlayerCharacter& character)
 }
 
 
-bool greaterInitiative(APlayerCharacter& c1, APlayerCharacter& c2)
+void APlayerManager::removeCharacter(APlayerCharacter& character)
 {
-	return (c1.getInitiative() < c2.getInitiative());
+	--numberOfCharacters;
+	CharacterArray.RemoveAt(character.getIndex());
+	setIndexes();
+	checkGameOver();
 }
 
 int APlayerManager::getnextTurn()
@@ -124,12 +129,48 @@ int APlayerManager::getnextTurn()
 	return turnIndex;
 }
 
+void APlayerManager::checkGameOver()
+{
+	bool playerAlive{ false };
+	bool enemyAlive{ false };
+
+	for (APlayerCharacter* character : CharacterArray)
+	{
+		if (character->isEnemy())
+			enemyAlive = true;
+		else
+			playerAlive = true;		
+	}
+	if (enemyAlive && playerAlive)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Game goes on!"));
+	}
+	else if (enemyAlive)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Enemies win!"));
+		AGameManager::endGame(false);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Players win!"));
+		AGameManager::endGame(true);
+	}
+}
+
 void APlayerManager::sortByInitiative()
 {
 	CharacterArray.Sort();
-
+	setIndexes();
 	CharacterArray[turnIndex]->setSelectedCharacter();
 } 
+
+void APlayerManager::setIndexes()
+{
+	for (int i{ 0 }; i < numberOfCharacters; ++i)
+	{
+		CharacterArray[i]->setIndex(i);
+	}
+}
 
 void APlayerManager::setNextTurn()
 {
@@ -142,18 +183,24 @@ void APlayerManager::setNextTurn()
 		else
 		{
 			turnIndex = 0;
+			AGameManager::nextRound();
 			CharacterArray[turnIndex]->setSelectedCharacter();
 		}
 	}
 }
 
-void APlayerManager::setAttacking()
+bool APlayerManager::setAttacking()
 {
 	if (m_selectedCharacter)
 	{
-		AHexGridManager::highlightsOff();
-		m_selectedCharacter->setAttacking();			
-	}	
+		bool success{ m_selectedCharacter->setAttacking() };
+		if (success)
+		{
+			//AHexGridManager::highlightsOff();
+		}
+		return success;
+	}
+	return false;
 }
 
 void APlayerManager::setIdle()
