@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "HexTile.h"
 #include "PlayerCharacter.generated.h"
 
 UENUM()
@@ -43,22 +42,22 @@ protected:
 
 	//STATS!!!
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		int m_initiative{};
+		int m_initiative;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		int m_movement{};
+		int m_movement;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		int m_movementLeft{};
+		int m_movementLeft;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		float m_attack{};
+		float m_attack;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		float m_maxHealth{};
+		float m_maxHealth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-		float m_currentHealth{};
+		float m_currentHealth;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 		PlayerCharacterClass m_playerCharacterClass;
@@ -78,13 +77,13 @@ protected:
 	USceneComponent* m_rootComponent;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		int m_index{};
+		int m_index;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		int m_hexLocationIndex {};
+		int m_hexLocationIndex;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-		FRotator m_charRotation {};
+		FRotator m_charRotation;
 
 	UPROPERTY(EditDefaultsOnly)
 		UAnimationAsset* m_idleAnim;
@@ -103,22 +102,18 @@ protected:
 
 		static APlayerCharacter* m_lastClicked;
 
-		//bool m_isMoving{};
-
-		FVector m_origin{};
-
-		FVector m_destination{};
-
-		float m_timeElapsed{};
+		FVector m_origin;
+		FVector m_destination;
+		float m_timeElapsed;
 
 		UPROPERTY(EditAnywhere, Category = "Movement")
-			float m_lerpDuration{};
+			float m_lerpDuration;
 
 		UPROPERTY(EditAnywhere, Category = "Movement")
-			float m_waitTime{};
+			float m_waitTime;
 
 		UPROPERTY(EditAnywhere, Category = "Movement")
-			float m_waitTime2{};
+			float m_waitTime2;
 
 
 
@@ -134,35 +129,20 @@ public:
 	APlayerCharacter();
 
 	void setIndex(int index);
-
 	int getIndex();
-
 	void setHexLocation(int hexIndex);
-
 	int getHexLocation();
-
 	FVector getLocation();
-
 	void setLocation(FVector location);
-
 	e_state getState();
-
 	void setEnemy(bool enemy);
-
 	bool isEnemy();
-
 	bool setAttacking();
-
 	bool getAttacking();
-
 	float getAttack();
-
 	bool getMoving();
-
 	bool isIdle();
-
 	void rotateTo(FVector location);
-	
 	void moveToHex(FVector destinationHex);
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
@@ -172,21 +152,13 @@ public:
 	void startIdling();
 
 	void setArrowOn(bool on);
-
 	int getInitiative();
-
 	int getMovementLeft();
-
 	void setMovementLeft(int movement);
-
 	void resetMovement();
-	
 	void resetHealth();
-
 	void updateHealth(bool damage, float delta);
-
 	void killMe();
-
 	bool isPlayer();
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")

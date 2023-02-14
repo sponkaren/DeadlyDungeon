@@ -4,8 +4,8 @@
 #include "HexGridManager.h"
 #include "PlayerCharacter.h"
 #include "PlayerManager.h"
+#include "AxialPixelConversion.h"
 #include <cstdlib>
-#include <assert.h>
 
 TArray<AHexTile*> AHexGridManager::HexGridArray{};
 
@@ -19,22 +19,13 @@ AHexGridManager::AHexGridManager()
 void AHexGridManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	//HexGrid2dArray
-	/*
-	HexGrid2DArray.SetNumZeroed(m_gridWidth);
-	for (int32 i{ 0 }; i < HexGrid2DArray.Num(); ++i)
-	{
-		HexGrid2DArray[i].SetNumZeroed(m_gridHeight);
-	}
-	*/
 
 	const int numberOfTiles{ m_gridWidth * m_gridHeight };
 	HexGridArray.SetNumZeroed(numberOfTiles);
 	
-	
-
+	//placeholder
 	FRotator Rotation = GetActorRotation();
+	
 	// always starting grid at position 0,0,0
 	int r{ 0 };
 	int q{ 0 };

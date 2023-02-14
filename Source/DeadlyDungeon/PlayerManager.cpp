@@ -39,6 +39,21 @@ void APlayerManager::Tick(float DeltaTime)
 void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 {	
 
+	if (hexIndex > AHexGridManager::HexGridArray.Num())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Index out of range, converting to highest possible"));
+		hexIndex = AHexGridManager::HexGridArray.Num()-1;
+	}
+
+	if (AHexGridManager::HexGridArray[hexIndex]->getOccupied() == true)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Can't spawn on occupied hex"));
+		return;
+	}
+
+
+	AHexGridManager::HexGridArray[hexIndex]->setOccupied(true);
+
 	CharacterArray.SetNum(numberOfCharacters+1);
 
 	if (enemy)
@@ -53,8 +68,6 @@ void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 	FRotator Rotation = GetActorRotation();
 	//FVector Location = GetActorLocation();
 	
-	//Occupied
-	AHexGridManager::HexGridArray[hexIndex]->setOccupied(true);
 
 	FVector Location = AHexGridManager::HexGridArray[hexIndex]->getLocation();
 	Location += FVector(0, 0, 7);
@@ -193,12 +206,7 @@ bool APlayerManager::setAttacking()
 {
 	if (m_selectedCharacter)
 	{
-		bool success{ m_selectedCharacter->setAttacking() };
-		if (success)
-		{
-			//AHexGridManager::highlightsOff();
-		}
-		return success;
+		return m_selectedCharacter->setAttacking();
 	}
 	return false;
 }
