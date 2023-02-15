@@ -17,6 +17,7 @@ enum class EHexTileType : uint8
 	INVALID,
 	GRASS,
 	WATER,
+	MENU,
 	MAX UMETA(Hidden)
 };
 

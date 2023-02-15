@@ -42,34 +42,34 @@ protected:
 
 	//STATS!!!
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		int m_initiative;
+	int m_initiative;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		int m_movement;
+	int m_movement;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		int m_movementLeft;
+	int m_movementLeft{};
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		float m_attack;
+	float m_attack;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		float m_maxHealth;
+	float m_maxHealth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-		float m_currentHealth;
+	float m_currentHealth;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-		PlayerCharacterClass m_playerCharacterClass;
+	PlayerCharacterClass m_playerCharacterClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-		CharacterType m_type;
+	CharacterType m_type;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-		USkeletalMeshComponent* m_playerCharacterMesh;
+	USkeletalMeshComponent* m_playerCharacterMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-		UStaticMeshComponent* m_arrowMesh;
+	UStaticMeshComponent* m_arrowMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 		
@@ -77,43 +77,43 @@ protected:
 	USceneComponent* m_rootComponent;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		int m_index;
+	int m_index;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-		int m_hexLocationIndex;
+	int m_hexLocationIndex;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-		FRotator m_charRotation;
+	FRotator m_charRotation;
 
 	UPROPERTY(EditDefaultsOnly)
-		UAnimationAsset* m_idleAnim;
+	UAnimationAsset* m_idleAnim;
 
 	UPROPERTY(EditDefaultsOnly)
-		UAnimationAsset* m_selectedAnim;
+	UAnimationAsset* m_selectedAnim;
 
 	UPROPERTY(EditDefaultsOnly)
-		UAnimationAsset* m_jumpAnim;
+	UAnimationAsset* m_jumpAnim;
 
 	UPROPERTY(EditDefaultsOnly)
-		UAnimationAsset* m_attackAnim;
+	UAnimationAsset* m_attackAnim;
 
 	UPROPERTY(EditDefaultsOnly)
-		UAnimationAsset* m_TPose;
+	UAnimationAsset* m_TPose;
 
-		static APlayerCharacter* m_lastClicked;
+	static APlayerCharacter* m_lastClicked;
 
-		FVector m_origin;
-		FVector m_destination;
-		float m_timeElapsed;
+	FVector m_origin;
+	FVector m_destination;
+	float m_timeElapsed;
 
-		UPROPERTY(EditAnywhere, Category = "Movement")
-			float m_lerpDuration;
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float m_lerpDuration;
 
-		UPROPERTY(EditAnywhere, Category = "Movement")
-			float m_waitTime;
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float m_waitTime;
 
-		UPROPERTY(EditAnywhere, Category = "Movement")
-			float m_waitTime2;
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float m_waitTime2;
 
 
 

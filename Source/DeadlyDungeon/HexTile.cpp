@@ -3,6 +3,7 @@
 #include "HexTile.h"
 #include "HexGridManager.h"
 #include "PlayerManager.h"
+#include "PlayerInventory.h"
 #include "AxialPixelConversion.h"
 
 // Sets default values
@@ -55,7 +56,7 @@ void AHexTile::setLocation(FVector vector)
 
 FVector AHexTile::getLocation()
 {
-	return m_location;
+	return GetActorLocation();
 }
 
 void AHexTile::setOccupied(bool occupied)
@@ -70,6 +71,21 @@ bool AHexTile::getOccupied()
 
 void AHexTile::hexClicked()
 {
+	if (m_tileType == EHexTileType::MENU)
+	{
+		if (getOccupied())
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Slot Occupied"));
+			return;
+		}
+		else
+		{
+			//APlayerInventory::addPlayerCharacter(getLocation());
+			setOccupied(true);
+			return;
+		}
+	}
+
 
 	if (!APlayerManager::getSelectedCharacer())
 	{

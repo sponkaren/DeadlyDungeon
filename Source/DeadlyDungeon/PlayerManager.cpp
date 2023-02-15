@@ -39,7 +39,7 @@ void APlayerManager::Tick(float DeltaTime)
 void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 {	
 
-	if (hexIndex > AHexGridManager::HexGridArray.Num())
+	if (hexIndex >= AHexGridManager::HexGridArray.Num())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Index out of range, converting to highest possible"));
 		hexIndex = AHexGridManager::HexGridArray.Num()-1;
@@ -54,7 +54,8 @@ void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 
 	AHexGridManager::HexGridArray[hexIndex]->setOccupied(true);
 
-	CharacterArray.SetNum(numberOfCharacters+1);
+	//CharacterArray.SetNum(numberOfCharacters+1);
+
 
 	if (enemy)
 	{
@@ -71,13 +72,16 @@ void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 
 	FVector Location = AHexGridManager::HexGridArray[hexIndex]->getLocation();
 	Location += FVector(0, 0, 7);
-	APlayerCharacter* newPlayer = GetWorld()->SpawnActor<APlayerCharacter>
-		(m_characterToSpawn, Location, Rotation);
+
+	APlayerCharacter* newPlayer = CharacterArray.Emplace_GetRef(GetWorld()->SpawnActor<APlayerCharacter>
+		(m_characterToSpawn, Location, Rotation));
 
 	newPlayer->setHexLocation(hexIndex);
 	newPlayer->setLocation(Location);
 	newPlayer->setEnemy(enemy);
-	CharacterArray[numberOfCharacters++] = newPlayer;
+
+
+	//CharacterArray[numberOfCharacters++] = newPlayer;
 }
 
 void APlayerManager::storeSelectedCharacter(APlayerCharacter* selectedCharacter)
