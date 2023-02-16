@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "DungeonController.generated.h"
+#include "DeadlyDungeonController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DEADLYDUNGEON_API ADungeonController : public APlayerController
+class DEADLYDUNGEON_API ADeadlyDungeonController : public APlayerController
 {
 	GENERATED_BODY()
 	

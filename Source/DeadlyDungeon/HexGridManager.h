@@ -32,6 +32,9 @@ public:
 
 	AHexGridManager();
 
+	UFUNCTION()
+	void whenHexClicked(AHexTile* hex);
+
 	static bool checkIfAdjacent(AHexTile* h1, AHexTile* h2);
 	static bool validateMovement(int hexTileIndex);
 	static bool validateAttack(int hexTileIndex);

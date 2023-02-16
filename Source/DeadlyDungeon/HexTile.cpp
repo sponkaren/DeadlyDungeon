@@ -1,12 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "HexTile.h"
-#include "HexGridManager.h"
-#include "PlayerManager.h"
-#include "PlayerInventory.h"
-#include "AxialPixelConversion.h"
 
-// Sets default values
+
 AHexTile::AHexTile()
 {
 	m_rootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
@@ -71,38 +65,7 @@ bool AHexTile::getOccupied()
 
 void AHexTile::hexClicked()
 {
-	if (m_tileType == EHexTileType::MENU)
-	{
-		if (getOccupied())
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Slot Occupied"));
-			return;
-		}
-		else
-		{
-			//APlayerInventory::addPlayerCharacter(getLocation());
-			setOccupied(true);
-			return;
-		}
-	}
-
-
-	if (!APlayerManager::getSelectedCharacer())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No selected character"));
-	}
-	
-	else if (AHexGridManager::validateMovement(m_index))
-	{
-		if (!m_occupied)
-		{		
-			APlayerManager::movePlayerCharacter(m_index);
-		}
-		else if (m_occupied)
-		{
-			APlayerManager::occupiedHexClicked(m_index);
-		}
-	}
+	HexTileClicked.Broadcast(this);
 }
 
 

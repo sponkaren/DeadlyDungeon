@@ -9,7 +9,7 @@
 #include <Containers/UnrealString.h>
 #include "HexTile.generated.h"
 
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHexClicked, AHexTile*, hex);
 
 UENUM()
 enum class EHexTileType : uint8
@@ -27,42 +27,47 @@ class DEADLYDUNGEON_API AHexTile : public AActor
 	GENERATED_BODY()
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
-		EHexTileType m_tileType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
-		UStaticMeshComponent* m_tileMesh;
+		UStaticMeshComponent* m_tileMesh {};
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
-		UStaticMeshComponent* m_tileHighlight;
+		UStaticMeshComponent* m_tileHighlight {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
-		UStaticMeshComponent* m_tileAttackHighlight;
+		UStaticMeshComponent* m_tileAttackHighlight {};
 
 	USceneComponent* m_rootComponent;
 
-	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
-		bool m_occupied;
+public:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
+	EHexTileType m_tileType {};
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
-	FVector m_location;
+	bool m_occupied{};
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
-	int m_axialR;
+	FVector m_location{};
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
+	int m_axialR{};
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Tile");
-	int m_axialQ;
+	int m_axialQ{};
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Tile");
-	int m_axialS;
+	int m_axialS{};
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
-	int m_index;
+	int m_index{};
 
-public:	
 	// Sets default values for this actor's properties
 	AHexTile();
+
+	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
+	FOnHexClicked HexTileClicked;
 
 	void setAxial(int r, int q);
 	int getAxialR();

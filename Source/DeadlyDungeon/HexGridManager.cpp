@@ -20,6 +20,11 @@ void AHexGridManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//AHexTile* clickedHex = Cast<AHexTile>(this);
+
+	//clickedHex->HexTileClicked.AddUniqueDynamic(this,
+		//&AHexGridManager::whenHexClicked);	
+
 	const int numberOfTiles{ m_gridWidth * m_gridHeight };
 	HexGridArray.SetNumZeroed(numberOfTiles);
 	
@@ -44,9 +49,11 @@ void AHexGridManager::BeginPlay()
 		//setting some tile data
 		newTile->setAxial(r, q);
 		newTile->setLocation(Location);
-		newTile->setIndex(tileNumber);
+		newTile->setIndex(tileNumber);	
 
 		HexGridArray[tileNumber] = newTile;
+		
+		newTile->HexTileClicked.AddDynamic(this, &AHexGridManager::whenHexClicked);
 
 		int qTopValue{ m_gridHeight - (r + 1) / 2 - (r + 1) % 2 };
 		if (q < qTopValue)
@@ -64,6 +71,45 @@ void AHexGridManager::BeginPlay()
 
 		}
 	}
+}
+
+
+void AHexGridManager::whenHexClicked(AHexTile* hex)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Holy shit!"));
+
+	if (hex->m_tileType == EHexTileType::MENU)
+	{
+		if (hex->getOccupied())
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Slot Occupied"));
+			return;
+		}
+		else
+		{
+			//APlayerInventory::addPlayerCharacter(getLocation());
+			hex->setOccupied(true);
+			return;
+		}
+	}
+
+	if (!APlayerManager::getSelectedCharacer())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No selected character"));
+	}
+
+	else if (AHexGridManager::validateMovement(hex->m_index))
+	{
+		if (!hex->m_occupied)
+		{
+			APlayerManager::movePlayerCharacter(hex->m_index);
+		}
+		else if (hex->m_occupied)
+		{
+			APlayerManager::occupiedHexClicked(hex->m_index);
+		}
+	}
+
 }
 
 bool AHexGridManager::checkIfAdjacent(AHexTile* h1, AHexTile* h2)
