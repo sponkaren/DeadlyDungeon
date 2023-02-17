@@ -2,12 +2,8 @@
 
 
 #include "HexGridManager.h"
-#include "PlayerCharacter.h"
-#include "PlayerManager.h"
 #include "AxialPixelConversion.h"
 #include <cstdlib>
-
-TArray<AHexTile*> AHexGridManager::HexGridArray{};
 
 // Sets default values
 AHexGridManager::AHexGridManager()
@@ -20,15 +16,9 @@ void AHexGridManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//AHexTile* clickedHex = Cast<AHexTile>(this);
-
-	//clickedHex->HexTileClicked.AddUniqueDynamic(this,
-		//&AHexGridManager::whenHexClicked);	
-
 	const int numberOfTiles{ m_gridWidth * m_gridHeight };
 	HexGridArray.SetNumZeroed(numberOfTiles);
 	
-	//placeholder
 	FRotator Rotation = GetActorRotation();
 	
 	// always starting grid at position 0,0,0
@@ -76,8 +66,6 @@ void AHexGridManager::BeginPlay()
 
 void AHexGridManager::whenHexClicked(AHexTile* hex)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Holy shit!"));
-
 	if (hex->m_tileType == EHexTileType::MENU)
 	{
 		if (hex->getOccupied())
@@ -93,23 +81,7 @@ void AHexGridManager::whenHexClicked(AHexTile* hex)
 		}
 	}
 
-	if (!APlayerManager::getSelectedCharacer())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No selected character"));
-	}
-
-	else if (AHexGridManager::validateMovement(hex->m_index))
-	{
-		if (!hex->m_occupied)
-		{
-			APlayerManager::movePlayerCharacter(hex->m_index);
-		}
-		else if (hex->m_occupied)
-		{
-			APlayerManager::occupiedHexClicked(hex->m_index);
-		}
-	}
-
+	thisHexClicked.Broadcast(hex);
 }
 
 bool AHexGridManager::checkIfAdjacent(AHexTile* h1, AHexTile* h2)
@@ -124,26 +96,6 @@ bool AHexGridManager::checkIfAdjacent(AHexTile* h1, AHexTile* h2)
 	}
 
 	return((diffR <= 1) && (diffQ <= 1) && (diffS <= 1));
-}
-
-bool AHexGridManager::validateMovement(int hexIndex)
-{	
-	if (checkIfAdjacent(HexGridArray[hexIndex], HexGridArray[APlayerManager::getSelectedCharacer()->getHexLocation()]))
-	{
-		return true;
-	}
-	else
-		return false;
-}
-
-bool AHexGridManager::validateAttack(int hexIndex)
-{
-	if (checkIfAdjacent(HexGridArray[hexIndex], HexGridArray[APlayerManager::getSelectedCharacer()->getHexLocation()]))
-	{
-		return true;
-	}
-	else
-		return false;
 }
 
 void AHexGridManager::highlightTiles(int hexIndex) 

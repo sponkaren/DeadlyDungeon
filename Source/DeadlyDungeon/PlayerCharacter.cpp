@@ -1,16 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PlayerCharacter.h"
-#include "PlayerManager.h"
-#include "HexTile.h"
-#include "HexGridManager.h"
 #include <cassert>
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
 
-APlayerCharacter* APlayerCharacter::m_lastClicked{ nullptr };
 constexpr float baseWait{ 0.5 };
 
 // Sets default values
@@ -22,7 +18,6 @@ APlayerCharacter::APlayerCharacter()
 	m_arrowMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArrowMesh"));
 	m_playerCharacterMesh->SetupAttachment(m_rootComponent);
 	m_arrowMesh->SetupAttachment(m_rootComponent);
-	m_lastClicked = nullptr;
 	m_timeElapsed = 0;
 	m_lerpDuration = baseWait;
 	m_waitTime = baseWait;
@@ -147,14 +142,10 @@ bool APlayerCharacter::isEnemy()
 	return m_type == CharacterType::ENEMY;
 }
 
-bool APlayerCharacter::setAttacking()
+bool APlayerCharacter::rdyToAttack()
 {
 	if (m_state == IDLE)
 	{
-		m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_attackAnim, true);
-		m_state = ATTACKING;
-		AHexGridManager::highlightsOff();
-		AHexGridManager::highlightAttackTiles(getHexLocation());
 		return true;
 	}
 	else if (m_state == MOVING)
@@ -203,59 +194,17 @@ void APlayerCharacter::moveToHex(FVector destinationHex)
 		m_destination = destinationHex;
 		m_state = MOVING;
 		m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_jumpAnim, false);
-
-		//SetActorLocation(destinationHex);
 	}
-}
-
-void APlayerCharacter::setSelectedCharacter()
-{	
-	if (IsValid(m_lastClicked))
-	{
-		m_lastClicked->setMovementLeft(0);
-		m_lastClicked->startIdling();
-		m_lastClicked->setArrowOn(false);
-		AHexGridManager::highlightsOff();
-	}
-	m_lastClicked = this;
-	setArrowOn(true);
-	resetMovement();
-	m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_selectedAnim, true);
-	APlayerManager::storeSelectedCharacter(m_lastClicked);
-	AHexGridManager::highlightTiles(getHexLocation());
-
 }
 
 void APlayerCharacter::startIdling()
 {
-	AHexGridManager::highlightsOff();
-	m_state = IDLE;
-
-	if (m_movementLeft > 0)
-	{
-		m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_selectedAnim, true);
-		AHexGridManager::highlightTiles(getHexLocation());
-	}
-	else
-	{
-		m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_idleAnim, true);
-	}
-	
+	CharIdle.Broadcast(this);
 }
 
 void APlayerCharacter::setArrowOn(bool on)
 {
 	m_arrowMesh->SetVisibility(on, true);
-}
-
-int APlayerCharacter::getInitiative()
-{
-	return m_initiative;
-}
-
-int APlayerCharacter::getMovementLeft()
-{
-	return m_movementLeft;
 }
 
 void APlayerCharacter::setMovementLeft(int movement)
@@ -273,33 +222,24 @@ void APlayerCharacter::resetHealth()
 	m_currentHealth = m_maxHealth;
 }
 
-void APlayerCharacter::updateHealth(bool damage, float delta)
+bool APlayerCharacter::updateHealth(bool damage, float delta)
 {
 	if (damage)
 	{
 		m_currentHealth -= delta;
-
-		if (m_currentHealth <= 0)
-		{
-			killMe();
-		}
 	}
 	else
 	{
 		m_currentHealth += delta;
 	}
-}
 
-float APlayerCharacter::getCurrentHealth()
-{
-	return m_currentHealth;
+	return m_currentHealth <= 0;
 }
 
 float APlayerCharacter::getCurrentHealthPercent()
 {
 	return m_currentHealth/m_maxHealth;
 }
-
 
 bool APlayerCharacter::operator<(const APlayerCharacter& Other) const
 {
@@ -308,25 +248,7 @@ bool APlayerCharacter::operator<(const APlayerCharacter& Other) const
 
 void APlayerCharacter::characterClicked()
 {
-	if (m_currentHealth > 0)
-	{
-		APlayerManager::characterClicked(getCharacter());
-	}
-}
-
-void APlayerCharacter::killMe()
-{
-	m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_TPose, true);
-	m_playerCharacterMesh->SetSimulatePhysics(true);
-	
-	FRotator rotation{ UKismetMathLibrary::FindLookAtRotation(m_origin, APlayerManager::getSelectedCharacer()->getLocation()) };
-
-	FVector impulse{ rotation.Vector() * -5000 };
-	m_playerCharacterMesh->AddImpulse(impulse,"", true);
-	AHexGridManager::HexGridArray[m_hexLocationIndex]->setAttackHighightVisible(false);
-	AHexGridManager::HexGridArray[m_hexLocationIndex]->setOccupied(false);
-
-	APlayerManager::removeCharacter(getCharacter());
+	CharClicked.Broadcast(this);
 }
 
 APlayerCharacter& APlayerCharacter::getCharacter()

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "PlayerCharacter.h"
+#include "HexGridManager.h"
 #include "PlayerManager.generated.h"
 
 UCLASS()
@@ -20,52 +21,65 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	static int numberOfCharacters;
+	int numberOfCharacters;
 
 	UPROPERTY(EditAnywhere, Category = "Player Management")
-		TSubclassOf<APlayerCharacter> m_characterToSpawn;
+	TSubclassOf<APlayerCharacter> m_characterToSpawn;
 
 	UPROPERTY(EditAnywhere, Category = "Player Management")
-		TSubclassOf<APlayerCharacter> m_playerCharacter;
+	TSubclassOf<APlayerCharacter> m_playerCharacter;
 
 	UPROPERTY(EditAnywhere, Category = "Player Management")
-		TSubclassOf<APlayerCharacter> m_enemyCharacter;
+	TSubclassOf<APlayerCharacter> m_enemyCharacter;
 
-	static TArray<APlayerCharacter*> CharacterArray;
+	UPROPERTY(EditAnywhere, Category = "Player Management")
+	TSubclassOf<AHexGridManager> bp_hexManager;
 
-	static APlayerCharacter* m_selectedCharacter;
+	AHexGridManager* hexManager;
+
+	TArray<APlayerCharacter*> CharacterArray;
+
+	APlayerCharacter* m_selectedCharacter;
+
+	APlayerCharacter* lastClicked;
 
 	int maxPlayers{ 100 };
 
-	static int turnIndex;
+	int turnIndex;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
-	void spawnPlayer(int hexIndex, bool enemy);
-
-	void static storeSelectedCharacter(APlayerCharacter*);
-
-	static APlayerCharacter* getSelectedCharacer();
-
-	static void movePlayerCharacter(int destinationHexIndex);
-
-	static void occupiedHexClicked(int hexIndex);
-
-	static void characterClicked(APlayerCharacter& character);
-
-	static void removeCharacter(APlayerCharacter& character);
+	void spawnHexGridManager();
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
-		static void sortByInitiative();
+	void spawnPlayer(int hexIndex, bool enemy);
 
-	static void setIndexes();
+	void storeSelectedCharacter(APlayerCharacter*);
 
-	static int getnextTurn();
+	void setSelectedCharacter(APlayerCharacter* character);
 
-	static void checkGameOver();
+	APlayerCharacter* getSelectedCharacer();
+
+	void movePlayerCharacter(int destinationHexIndex);
+
+	void occupiedHexClicked(int hexIndex);
+
+	UFUNCTION()
+	void characterClicked(APlayerCharacter* character);
+
+	void removeCharacter(APlayerCharacter& character);
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	void sortByInitiative();
+
+	void setIndexes();
+
+	int getnextTurn();
+
+	void checkGameOver();
 	
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void setNextTurn();
@@ -74,5 +88,16 @@ public:
 	bool setAttacking();
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
-		void setIdle();
+	void selectedIdle();
+
+	UFUNCTION()
+	void setIdle(APlayerCharacter* character);
+
+	UFUNCTION()
+	void whenHexClicked(AHexTile* hex);
+
+	bool validateMovement(int hexIndex);
+
+	bool validateAttack(int hexIndex);
+
 };

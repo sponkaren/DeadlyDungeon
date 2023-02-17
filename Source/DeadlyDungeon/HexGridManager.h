@@ -7,6 +7,8 @@
 #include "HexTile.h"
 #include "HexGridManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnThisHexClicked, AHexTile*, hex);
+
 UCLASS()
 class DEADLYDUNGEON_API AHexGridManager : public AActor
 {
@@ -15,32 +17,34 @@ class DEADLYDUNGEON_API AHexGridManager : public AActor
 protected:
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid Layout")
-		int32 m_gridWidth;
+	int32 m_gridWidth;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid Layout")
-		int32 m_gridHeight;
+	int32 m_gridHeight;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid Layout")
-		TSubclassOf<AHexTile> m_grassHexTile;
+	TSubclassOf<AHexTile> m_grassHexTile;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid Layout")
-		TSubclassOf<AHexTile> m_waterHexTile;
+	TSubclassOf<AHexTile> m_waterHexTile;
 
 public:	
 	
-	static TArray<AHexTile*> HexGridArray;
-
 	AHexGridManager();
+
+	TArray<AHexTile*> HexGridArray;
+	
+	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
+
+	FOnThisHexClicked thisHexClicked;
 
 	UFUNCTION()
 	void whenHexClicked(AHexTile* hex);
 
-	static bool checkIfAdjacent(AHexTile* h1, AHexTile* h2);
-	static bool validateMovement(int hexTileIndex);
-	static bool validateAttack(int hexTileIndex);
-	static void highlightTiles(int hexIndex);
-	static void highlightAttackTiles(int hexIndex);
-	static void highlightsOff();
+	bool checkIfAdjacent(AHexTile* h1, AHexTile* h2);
+	void highlightTiles(int hexIndex);
+	void highlightAttackTiles(int hexIndex);
+	void highlightsOff();
 
 protected:
 	// Called when the game starts or when spawned

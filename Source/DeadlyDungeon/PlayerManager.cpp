@@ -2,16 +2,17 @@
 
 #include "PlayerManager.h"
 #include <algorithm>
+#include <array>
+#include "Kismet/KismetMathLibrary.h"
 #include "HexGridManager.h"
 #include "HexTile.h"
 #include "GameManager.h"
-#include <array>
 #include "PlayerCharacter.h"
 
-APlayerCharacter* APlayerManager::m_selectedCharacter{};
-TArray<APlayerCharacter*> APlayerManager::CharacterArray{};
-int APlayerManager::turnIndex{};
-int APlayerManager::numberOfCharacters{};
+//APlayerCharacter* APlayerManager::m_selectedCharacter{};
+//TArray<APlayerCharacter*> APlayerManager::CharacterArray{};
+//int APlayerManager::turnIndex{};
+//int APlayerManager::numberOfCharacters{};
 
 // Sets default values
 APlayerManager::APlayerManager()
@@ -23,39 +24,42 @@ APlayerManager::APlayerManager()
 	turnIndex = 0;
 }
 
-// Called when the game starts or when spawned
 void APlayerManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
 void APlayerManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);	
 }
 
+void APlayerManager::spawnHexGridManager()
+{
+	FRotator Rotation{ 0,0,0 };
+	FVector Location{ 0,0,0 };
+
+	hexManager = GetWorld()->SpawnActor<AHexGridManager>(bp_hexManager, Location, Rotation);
+	hexManager->thisHexClicked.AddDynamic(this, &APlayerManager::whenHexClicked);
+}
+
 void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 {	
 
-	if (hexIndex >= AHexGridManager::HexGridArray.Num())
+	if (hexIndex >= hexManager->HexGridArray.Num())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Index out of range, converting to highest possible"));
-		hexIndex = AHexGridManager::HexGridArray.Num()-1;
+		hexIndex = hexManager->HexGridArray.Num()-1;
 	}
 
-	if (AHexGridManager::HexGridArray[hexIndex]->getOccupied() == true)
+	if (hexManager->HexGridArray[hexIndex]->getOccupied() == true)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Can't spawn on occupied hex"));
 		return;
 	}
 
-
-	AHexGridManager::HexGridArray[hexIndex]->setOccupied(true);
-
-	//CharacterArray.SetNum(numberOfCharacters+1);
-
+	hexManager->HexGridArray[hexIndex]->setOccupied(true);
 
 	if (enemy)
 	{
@@ -66,28 +70,46 @@ void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 		m_characterToSpawn = m_playerCharacter;
 	}
 
-	FRotator Rotation = GetActorRotation();
-	//FVector Location = GetActorLocation();
-	
+	FRotator Rotation = GetActorRotation();	
 
-	FVector Location = AHexGridManager::HexGridArray[hexIndex]->getLocation();
+	FVector Location = hexManager->HexGridArray[hexIndex]->getLocation();
 	Location += FVector(0, 0, 7);
 
 	APlayerCharacter* newPlayer = CharacterArray.Emplace_GetRef(GetWorld()->SpawnActor<APlayerCharacter>
 		(m_characterToSpawn, Location, Rotation));
 
+	++numberOfCharacters;
+
 	newPlayer->setHexLocation(hexIndex);
 	newPlayer->setLocation(Location);
 	newPlayer->setEnemy(enemy);
 
-
-	//CharacterArray[numberOfCharacters++] = newPlayer;
+	newPlayer->CharClicked.AddDynamic(this, &APlayerManager::characterClicked);
+	newPlayer->CharIdle.AddDynamic(this, &APlayerManager::setIdle);
 }
 
 void APlayerManager::storeSelectedCharacter(APlayerCharacter* selectedCharacter)
 {
 	m_selectedCharacter = selectedCharacter;
 }
+
+void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
+{
+	if (IsValid(lastClicked))
+	{
+		lastClicked->setMovementLeft(0);
+		setIdle(lastClicked);
+		lastClicked->setArrowOn(false);
+		hexManager->highlightsOff();
+	}
+	lastClicked = character;
+	character->setArrowOn(true);
+	character->resetMovement();
+	character->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character->m_selectedAnim, true);
+	APlayerManager::storeSelectedCharacter(character);
+	hexManager->highlightTiles(character->getHexLocation());
+}
+
 
 APlayerCharacter* APlayerManager::getSelectedCharacer()
 {
@@ -96,15 +118,15 @@ APlayerCharacter* APlayerManager::getSelectedCharacer()
 
 void APlayerManager::movePlayerCharacter(int destIndex)
 {
-	if (m_selectedCharacter && m_selectedCharacter->getMovementLeft()>0)
+	if (m_selectedCharacter && m_selectedCharacter->m_movementLeft>0)
 	{
 		
-		if (!AHexGridManager::HexGridArray[destIndex]->getOccupied() && m_selectedCharacter->isIdle())
+		if (!hexManager->HexGridArray[destIndex]->getOccupied() && m_selectedCharacter->isIdle())
 		{
-			AHexGridManager::HexGridArray[m_selectedCharacter->getHexLocation()]->setOccupied(false);
-			AHexGridManager::HexGridArray[destIndex]->setOccupied(true);
-			AHexGridManager::highlightsOff();
-			FVector destination = AHexGridManager::HexGridArray[destIndex]->getLocation() + FVector(0, 0, 7);
+			hexManager->HexGridArray[m_selectedCharacter->getHexLocation()]->setOccupied(false);
+			hexManager->HexGridArray[destIndex]->setOccupied(true);
+			hexManager->highlightsOff();
+			FVector destination = hexManager->HexGridArray[destIndex]->getLocation() + FVector(0, 0, 7);
 			m_selectedCharacter->moveToHex(destination);
 			m_selectedCharacter->setHexLocation(destIndex);
 		}
@@ -119,22 +141,57 @@ void APlayerManager::occupiedHexClicked(int hexIndex)
 	}
 }
 
-void APlayerManager::characterClicked(APlayerCharacter& character)
+void APlayerManager::characterClicked(APlayerCharacter* character)
 {
+	if (character->m_currentHealth <= 0)
+		return;
+
 	if (m_selectedCharacter->getAttacking())
 	{
-		if (AHexGridManager::validateAttack(character.getHexLocation()))
+		if (validateAttack(character->getHexLocation()))
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Attack!"));
-			m_selectedCharacter->rotateTo(character.getLocation());
-			character.updateHealth(true, m_selectedCharacter->getAttack());
+			m_selectedCharacter->rotateTo(character->getLocation());
+			if (character->updateHealth(true, m_selectedCharacter->getAttack()))
+			{
+				removeCharacter(*character);
+			}
 		}
 	}
 }
 
+void APlayerManager::whenHexClicked(AHexTile* hex)
+{
+	if (!getSelectedCharacer())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No selected character"));
+	}
+
+	else if (validateMovement(hex->m_index))
+	{
+		if (!hex->m_occupied)
+		{
+			movePlayerCharacter(hex->m_index);
+		}
+		else if (hex->m_occupied)
+		{
+			occupiedHexClicked(hex->m_index);
+		}
+	}
+}
 
 void APlayerManager::removeCharacter(APlayerCharacter& character)
 {
+	character.m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character.m_TPose, true);
+	character.m_playerCharacterMesh->SetSimulatePhysics(true);
+
+	FRotator rotation{ UKismetMathLibrary::FindLookAtRotation(character.m_origin, APlayerManager::getSelectedCharacer()->getLocation()) };
+
+	FVector impulse{ rotation.Vector() * -5000 };
+	character.m_playerCharacterMesh->AddImpulse(impulse, "", true);
+	hexManager->HexGridArray[character.m_hexLocationIndex]->setAttackHighightVisible(false);
+	hexManager->HexGridArray[character.m_hexLocationIndex]->setOccupied(false);
+
 	--numberOfCharacters;
 	CharacterArray.RemoveAt(character.getIndex());
 	setIndexes();
@@ -178,7 +235,7 @@ void APlayerManager::sortByInitiative()
 {
 	CharacterArray.Sort();
 	setIndexes();
-	CharacterArray[turnIndex]->setSelectedCharacter();
+	setSelectedCharacter(CharacterArray[turnIndex]);
 } 
 
 void APlayerManager::setIndexes()
@@ -195,13 +252,13 @@ void APlayerManager::setNextTurn()
 	{
 		if (turnIndex < CharacterArray.Num() - 1)
 		{
-			CharacterArray[++turnIndex]->setSelectedCharacter();
+			setSelectedCharacter(CharacterArray[++turnIndex]);
 		}
 		else
 		{
 			turnIndex = 0;
 			AGameManager::nextRound();
-			CharacterArray[turnIndex]->setSelectedCharacter();
+			setSelectedCharacter(CharacterArray[turnIndex]);
 		}
 	}
 }
@@ -210,15 +267,55 @@ bool APlayerManager::setAttacking()
 {
 	if (m_selectedCharacter)
 	{
-		return m_selectedCharacter->setAttacking();
+		if (m_selectedCharacter->rdyToAttack())
+		{
+			m_selectedCharacter->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_selectedCharacter->m_attackAnim, true);
+			m_selectedCharacter->m_state = m_selectedCharacter->ATTACKING;
+			hexManager->highlightsOff();
+			hexManager->highlightAttackTiles(m_selectedCharacter->getHexLocation());
+			return true;
+		}
 	}
 	return false;
 }
 
-void APlayerManager::setIdle()
+void APlayerManager::selectedIdle()
 {
-	if (m_selectedCharacter)
+	m_selectedCharacter->startIdling();
+}
+
+void APlayerManager::setIdle(APlayerCharacter* character)
+{
+	hexManager->highlightsOff();
+	character->m_state = character->IDLE;
+
+	if (character->m_movementLeft > 0)
 	{
-		m_selectedCharacter->startIdling();	
+		character->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character->m_selectedAnim, true);
+		hexManager->highlightTiles(character->getHexLocation());
 	}
+	else
+	{
+		character->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character->m_idleAnim, true);
+	}
+}
+
+bool APlayerManager::validateMovement(int hexIndex)
+{
+	if (hexManager->checkIfAdjacent(hexManager->HexGridArray[hexIndex], hexManager->HexGridArray[getSelectedCharacer()->getHexLocation()]))
+	{
+		return true;
+	}
+	else
+		return false;
+}
+
+bool APlayerManager::validateAttack(int hexIndex)
+{
+	if (hexManager->checkIfAdjacent(hexManager->HexGridArray[hexIndex], hexManager->HexGridArray[getSelectedCharacer()->getHexLocation()]))
+	{
+		return true;
+	}
+	else
+		return false;
 }

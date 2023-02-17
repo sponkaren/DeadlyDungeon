@@ -6,6 +6,10 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharClicked, APlayerCharacter*, character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharIdle, APlayerCharacter*, character);
+
+
 UENUM()
 enum class PlayerCharacterClass : uint8
 {
@@ -29,7 +33,7 @@ class DEADLYDUNGEON_API APlayerCharacter : public APawn
 	GENERATED_BODY()
 	
 
-protected:
+public:
 
 	enum e_state
 	{
@@ -73,7 +77,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 		
-
 	USceneComponent* m_rootComponent;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
@@ -100,8 +103,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UAnimationAsset* m_TPose;
 
-	static APlayerCharacter* m_lastClicked;
-
 	FVector m_origin;
 	FVector m_destination;
 	float m_timeElapsed;
@@ -115,11 +116,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float m_waitTime2;
 
-
-
-
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -127,6 +123,12 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	APlayerCharacter();
+
+	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
+	FOnCharClicked CharClicked;
+
+	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
+	FOnCharIdle CharIdle;
 
 	void setIndex(int index);
 	int getIndex();
@@ -137,7 +139,7 @@ public:
 	e_state getState();
 	void setEnemy(bool enemy);
 	bool isEnemy();
-	bool setAttacking();
+	bool rdyToAttack();
 	bool getAttacking();
 	float getAttack();
 	bool getMoving();
@@ -146,31 +148,22 @@ public:
 	void moveToHex(FVector destinationHex);
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
-	void setSelectedCharacter();
-
-	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void startIdling();
 
 	void setArrowOn(bool on);
-	int getInitiative();
-	int getMovementLeft();
 	void setMovementLeft(int movement);
 	void resetMovement();
 	void resetHealth();
-	void updateHealth(bool damage, float delta);
-	void killMe();
+	bool updateHealth(bool damage, float delta);
 	bool isPlayer();
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
-	float getCurrentHealth();
-
-	UFUNCTION(BlueprintCallable, Category = "Player Management")
-		float getCurrentHealthPercent();
+	float getCurrentHealthPercent();
 
 	FORCEINLINE bool operator<(const APlayerCharacter& Other) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
-		void characterClicked();
+	void characterClicked();
 
 	APlayerCharacter& getCharacter();
 };
