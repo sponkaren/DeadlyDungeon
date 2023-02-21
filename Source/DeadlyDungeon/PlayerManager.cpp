@@ -6,7 +6,6 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "HexGridManager.h"
 #include "HexTile.h"
-#include "GameManager.h"
 #include "PlayerCharacter.h"
 
 //APlayerCharacter* APlayerManager::m_selectedCharacter{};
@@ -222,12 +221,10 @@ void APlayerManager::checkGameOver()
 	else if (enemyAlive)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Enemies win!"));
-		AGameManager::endGame(false);
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Players win!"));
-		AGameManager::endGame(true);
 	}
 }
 
@@ -257,7 +254,6 @@ void APlayerManager::setNextTurn()
 		else
 		{
 			turnIndex = 0;
-			AGameManager::nextRound();
 			setSelectedCharacter(CharacterArray[turnIndex]);
 		}
 	}

@@ -1,0 +1,28 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "PlayerCharacter.h"
+#include "GameFramework/SaveGame.h"
+#include "DeadlySave.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class DEADLYDUNGEON_API UDeadlySave : public USaveGame
+{
+	GENERATED_BODY()
+
+public:
+
+	UDeadlySave();
+
+	//TArray<APlayerCharacter> alivePlayers;
+
+	//TArray<APlayerCharacter> deadPlayers;
+
+	UPROPERTY(VisibleAnywhere, Category = Basic)
+	int lastDungeonUnlock;
+};
