@@ -103,7 +103,7 @@ void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
 	}
 	lastClicked = character;
 	character->setArrowOn(true);
-	character->resetMovement();
+	character->resetMoveAtk();
 	character->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character->m_selectedAnim, true);
 	APlayerManager::storeSelectedCharacter(character);
 	hexManager->highlightTiles(character->getHexLocation());
@@ -154,6 +154,10 @@ void APlayerManager::characterClicked(APlayerCharacter* character)
 			if (character->updateHealth(true, m_selectedCharacter->getAttack()))
 			{
 				removeCharacter(*character);
+			}
+			if (--m_selectedCharacter->m_numberOfAttacksLeft <= 0)
+			{
+				setIdle(m_selectedCharacter);				
 			}
 		}
 	}
@@ -271,6 +275,7 @@ bool APlayerManager::setAttacking()
 			hexManager->highlightAttackTiles(m_selectedCharacter->getHexLocation());
 			return true;
 		}
+		return false;	
 	}
 	return false;
 }

@@ -48,5 +48,4 @@ public:
 
 	UFUNCTION()
 	void SaveCharacter(APlayerCharacter* character);
-
 };

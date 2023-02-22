@@ -9,12 +9,22 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharClicked, APlayerCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharIdle, APlayerCharacter*, character);
 
+struct PlayerStruct
+{
+	int initiative;
+	int movement;
+	float attack;
+	int numberOfAttacks;
+	float maxHealth;
+};
+
 
 UENUM()
 enum class PlayerCharacterClass : uint8
 {
 	OTTO,
 	WARRIOR,
+	HEALER,
 	MAGE,
 	MAX UMETA(Hidden)
 };
@@ -44,7 +54,10 @@ public:
 
 	e_state m_state;
 
-	//STATS!!!
+	//personal
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
+	PlayerCharacterClass m_playerCharacterClass;
+
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 	int m_initiative;
 
@@ -52,19 +65,24 @@ public:
 	int m_movement;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-	int m_movementLeft{};
-
-	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 	float m_attack;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+	int m_numberOfAttacks;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 	float m_maxHealth;
+	//end of stats
+
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+	int m_movementLeft{};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 	float m_currentHealth;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-	PlayerCharacterClass m_playerCharacterClass;
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+	int m_numberOfAttacksLeft;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 	CharacterType m_type;
@@ -124,6 +142,9 @@ public:
 	
 	APlayerCharacter();
 
+	void setStats(PlayerStruct& stats);
+	PlayerStruct getStats();
+
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 	FOnCharClicked CharClicked;
 
@@ -152,7 +173,7 @@ public:
 
 	void setArrowOn(bool on);
 	void setMovementLeft(int movement);
-	void resetMovement();
+	void resetMoveAtk();
 	void resetHealth();
 	bool updateHealth(bool damage, float delta);
 	bool isPlayer();

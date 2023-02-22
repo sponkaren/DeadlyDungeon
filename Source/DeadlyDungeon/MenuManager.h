@@ -30,6 +30,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Player Management")
 	TSubclassOf<APlayerCharacter> playerCharacter;
 
+	FRotator Rotation;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -39,6 +41,12 @@ public:
 
 	void setHexDelegates();
 
+	void spawnAlivePlayer(PlayerStruct player, int hex);
+
+	void showLastDungeonUnlock(int unlock);
+
 	UFUNCTION()
 	void whenHexClicked(AHexTile* hex);
+
+	void getHex();
 };

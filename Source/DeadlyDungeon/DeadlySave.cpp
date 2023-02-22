@@ -5,5 +5,4 @@
 
 UDeadlySave::UDeadlySave()
 {
-
 }

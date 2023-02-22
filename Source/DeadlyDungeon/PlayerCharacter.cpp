@@ -29,12 +29,29 @@ APlayerCharacter::APlayerCharacter()
 	//Stats
 	m_initiative = FMath::RandRange(1, 9);
 	m_movement = 3;
-	resetMovement();
+	m_numberOfAttacks = 1;
 	m_attack = 10;
 	m_maxHealth = 100;
+	resetMoveAtk();
 	resetHealth();
 }
 
+
+void APlayerCharacter::setStats(PlayerStruct& stats)
+{
+	m_initiative = stats.initiative;
+	m_movement = stats.movement;
+	m_numberOfAttacks = stats.numberOfAttacks;
+	m_attack = stats.attack;
+	m_maxHealth = stats.maxHealth;
+}
+
+PlayerStruct APlayerCharacter::getStats()
+{
+	PlayerStruct playerStruct = { m_initiative, m_movement, m_numberOfAttacks, m_attack, m_maxHealth };
+	
+	return playerStruct;
+}
 
 
 // Called every frame
@@ -144,7 +161,11 @@ bool APlayerCharacter::isEnemy()
 
 bool APlayerCharacter::rdyToAttack()
 {
-	if (m_state == IDLE)
+	if (m_numberOfAttacksLeft <= 0)
+	{
+		return false;
+	}
+	else if (m_state == IDLE)
 	{
 		return true;
 	}
@@ -161,7 +182,7 @@ bool APlayerCharacter::rdyToAttack()
 
 bool APlayerCharacter::getAttacking()
 {
-	return m_state == ATTACKING;
+	return (m_state == ATTACKING && m_numberOfAttacksLeft > 0);
 }
 
 float APlayerCharacter::getAttack()
@@ -212,9 +233,10 @@ void APlayerCharacter::setMovementLeft(int movement)
 	m_movementLeft = movement;
 }
 
-void APlayerCharacter::resetMovement()
+void APlayerCharacter::resetMoveAtk()
 {
 	m_movementLeft = m_movement;
+	m_numberOfAttacksLeft = m_numberOfAttacks;
 }
 
 void APlayerCharacter::resetHealth()

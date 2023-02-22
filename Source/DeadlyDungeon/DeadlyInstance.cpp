@@ -2,25 +2,40 @@
 
 
 #include "DeadlyInstance.h"
+#include "Containers/Array.h"
 #include "MenuManager.h"
 #include "PlayerManager.h"
 #include "Kismet/Gameplaystatics.h"
 
 
 void UDeadlyInstance::Setup()
-{
-    // SaveGame();
-    
+{   
     SaveGameSlotName = "DeadlySlot";
-
-    LoadGame();
-
+    LoadGame();    
     menuActor = UGameplayStatics::GetActorOfClass(GetWorld(), AMenuManager::StaticClass());
     
     if(menuActor)
     { 
         menuManager = Cast<AMenuManager>(menuActor);
         menuManager->CharacterCreated.AddDynamic(this, &UDeadlyInstance::SaveCharacter);
+        menuManager->getHex();
+
+        if (SaveGameObject->One == true)
+        {
+            menuManager->spawnAlivePlayer(SaveGameObject->characterOne, 0);
+        }
+        if (SaveGameObject->Two == true)
+        {
+            menuManager->spawnAlivePlayer(SaveGameObject->characterTwo, 1);
+        }
+        if (SaveGameObject->Three == true)
+        {
+            menuManager->spawnAlivePlayer(SaveGameObject->characterThree, 2);
+        }
+        if (SaveGameObject->Four == true)
+        {
+            menuManager->spawnAlivePlayer(SaveGameObject->characterFour, 3);
+        }
     }
 
     //playerManager = UGameplayStatics::GetActorOfClass(GetWorld(), AMenuManager::StaticClass());
@@ -42,7 +57,6 @@ void UDeadlyInstance::LoadGame()
 
         // Instantiate a new SaveGame object
         SaveGameObject = Cast<UDeadlySave>(UGameplayStatics::CreateSaveGameObject(UDeadlySave::StaticClass()));
-        SaveGameObject->lastDungeonUnlock = 3;
 
         // Call SaveGameToSlot to serialize and save our SaveGameObject with name: <SaveGameSlotName>.sav
         bool IsSaved = UGameplayStatics::SaveGameToSlot(SaveGameObject, SaveGameSlotName, 0);
@@ -69,6 +83,32 @@ void UDeadlyInstance::SaveCharacter(APlayerCharacter* character)
 {
 
     GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Save that shit!"));
+ 
+    //When arrays don't cooperate..
+    if (SaveGameObject->One == false)
+    {
+        SaveGameObject->characterOne = character->getStats();
+        SaveGameObject->One = true;
+    }
+    else if (SaveGameObject->Two == false)
+    {
+        SaveGameObject->characterTwo = character->getStats();
+        SaveGameObject->Two = true;
+    }
+    else if (SaveGameObject->Three == false)
+    {
+        SaveGameObject->characterThree = character->getStats();
+        SaveGameObject->Three = true;
+    }
+    else if (SaveGameObject->Four == false)
+    {
+        SaveGameObject->characterFour = character->getStats();
+        SaveGameObject->Four = true;
+    }
+
+    bool IsSaved = UGameplayStatics::SaveGameToSlot(SaveGameObject, SaveGameSlotName, 0);
+
+    LogIfGameWasSavedOrNot(IsSaved);
 }
 
 void UDeadlyInstance::LogIfGameWasSavedOrNot(const bool IsSaved)
