@@ -55,15 +55,24 @@ public:
 	void spawnHexGridManager();
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
-	void spawnPlayer(int hexIndex, bool enemy);
+	void handlePlayersToSpawn(TArray<FPlayerStruct>& players);
+
+	void spawnEnemies(int difficulty, int numberOfEnemies);
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	void spawnPlayer(FPlayerStruct& stats, int hexIndex, bool enemy);
 
 	void storeSelectedCharacter(APlayerCharacter*);
 
 	void setSelectedCharacter(APlayerCharacter* character);
 
 	APlayerCharacter* getSelectedCharacer();
+	
+	void startAI();
 
 	void movePlayerCharacter(int destinationHexIndex);
+
+	void moveEnemy(const TArray<int>& movements);
 
 	void occupiedHexClicked(int hexIndex);
 

@@ -20,27 +20,11 @@ public:
 
 	UDeadlySave();
 	
-	//UPROPERTY(VisibleAnywhere, Category = Basic)
-	PlayerStruct characterOne;
 	UPROPERTY(VisibleAnywhere, Category = Basic)
-	bool One{ false };
-
-	//UPROPERTY(VisibleAnywhere, Category = Basic)
-	PlayerStruct characterTwo;
+	TArray<FPlayerStruct> alivePlayers;
+	
 	UPROPERTY(VisibleAnywhere, Category = Basic)
-	bool Two{ false };
-
-	//UPROPERTY(VisibleAnywhere, Category = Basic)
-	PlayerStruct characterThree;
-	UPROPERTY(VisibleAnywhere, Category = Basic)
-	bool Three{ false };
-
-	//UPROPERTY(VisibleAnywhere, Category = Basic)
-	PlayerStruct characterFour;
-	UPROPERTY(VisibleAnywhere, Category = Basic)
-	bool Four{ false };
-
-	TArray<PlayerStruct> deadPlayers;
+	TArray<FPlayerStruct> deadPlayers;
 
 	UPROPERTY(VisibleAnywhere, Category = Basic)
 	int lastDungeonUnlock;

@@ -90,5 +90,7 @@ public:
 
 	void setAttackHighightVisible(bool on);
 
+	int getDistance(const AHexTile& refHex);
+
 	AHexTile& getHex();
 };

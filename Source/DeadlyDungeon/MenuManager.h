@@ -41,7 +41,7 @@ public:
 
 	void setHexDelegates();
 
-	void spawnAlivePlayer(PlayerStruct player, int hex);
+	void spawnAlivePlayers(TArray<FPlayerStruct>& players);
 
 	void showLastDungeonUnlock(int unlock);
 

@@ -3,6 +3,7 @@
 
 #include "MenuManager.h"
 #include "HexTile.h"
+#include "StatGenerator.h"
 #include "DeadlyInstance.h"
 #include "Containers/Array.h"
 #include "Kismet/GameplayStatics.h"
@@ -39,12 +40,26 @@ void AMenuManager::setHexDelegates()
 	}
 }
 
-void AMenuManager::spawnAlivePlayer(PlayerStruct player, int hex)
+void AMenuManager::spawnAlivePlayers(TArray<FPlayerStruct>& players)
 {
-	FVector Location = foundHex[hex]->GetActorLocation() + FVector(0, 0, 7);
-	Cast<AHexTile>(foundHex[hex])->setOccupied(true);
+	int i{ 0 };
+	for (FPlayerStruct stats : players)
+	{
+		if(i<foundHex.Num())
+		{
+			FVector Location = foundHex[i]->GetActorLocation() + FVector(0, 0, 7);			
+			FTransform SpawnTransform(Rotation, Location);
 
-	APlayerCharacter* newPlayer = GetWorld()->SpawnActor<APlayerCharacter>(playerCharacter, Location, Rotation);
+			APlayerCharacter* player = GetWorld()->SpawnActorDeferred<APlayerCharacter>(playerCharacter, SpawnTransform);
+			player->Init(stats);
+			player->FinishSpawning(SpawnTransform);
+		}
+		++i;
+	}
+
+	//FVector Location = foundHex[hex]->GetActorLocation() + FVector(0, 0, 7);
+	//Cast<AHexTile>(foundHex[hex])->setOccupied(true);
+	//APlayerCharacter* newPlayer = GetWorld()->SpawnActor<APlayerCharacter>(playerCharacter, Location, Rotation);
 }
 
 
@@ -66,7 +81,12 @@ void AMenuManager::whenHexClicked(AHexTile* hex)
 
 		FVector Location = hex->getLocation() + FVector(0,0,7);
 
-		APlayerCharacter* newPlayer = GetWorld()->SpawnActor<APlayerCharacter> (playerCharacter, Location, Rotation);	
+		FTransform SpawnTransform(Rotation, Location);
+
+		APlayerCharacter* newPlayer = GetWorld()->SpawnActorDeferred<APlayerCharacter>(playerCharacter, SpawnTransform);
+		FPlayerStruct stats{ StatGenerator::generateStats(1)};
+		newPlayer->Init(stats);
+		newPlayer->FinishSpawning(SpawnTransform);
 
 		CharacterCreated.Broadcast(newPlayer);
 	}

@@ -9,8 +9,11 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharClicked, APlayerCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharIdle, APlayerCharacter*, character);
 
-struct PlayerStruct
+USTRUCT(BlueprintType)
+struct FPlayerStruct
 {
+	GENERATED_BODY()
+public:
 	int initiative;
 	int movement;
 	float attack;
@@ -37,6 +40,8 @@ enum class CharacterType : uint8
 	MAX UMETA (Hidden)
 };
 
+constexpr float baseWait{ 0.5 };
+
 UCLASS()
 class DEADLYDUNGEON_API APlayerCharacter : public APawn
 {
@@ -52,7 +57,7 @@ public:
 		ATTACKING,		
 	};
 
-	e_state m_state;
+	e_state m_state{ IDLE };
 
 	//personal
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
@@ -85,7 +90,7 @@ public:
 	int m_numberOfAttacksLeft;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-	CharacterType m_type;
+	CharacterType m_type {CharacterType::ALLY};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 	USkeletalMeshComponent* m_playerCharacterMesh;
@@ -93,12 +98,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 	UStaticMeshComponent* m_arrowMesh;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-		
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")	
 	USceneComponent* m_rootComponent;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
-	int m_index;
+	int m_index{ 999 };
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 	int m_hexLocationIndex;
@@ -123,16 +127,17 @@ public:
 
 	FVector m_origin;
 	FVector m_destination;
-	float m_timeElapsed;
+	
+	float m_timeElapsed{ 0 };
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float m_lerpDuration;
+	float m_lerpDuration{ baseWait };
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float m_waitTime;
+		float m_waitTime{ baseWait };
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float m_waitTime2;
+	float m_waitTime2{ baseWait };
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -142,8 +147,10 @@ public:
 	
 	APlayerCharacter();
 
-	void setStats(PlayerStruct& stats);
-	PlayerStruct getStats();
+	void Init(FPlayerStruct& stats);
+
+	void setStats(FPlayerStruct& stats);
+	FPlayerStruct getStats();
 
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 	FOnCharClicked CharClicked;

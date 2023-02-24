@@ -1,4 +1,6 @@
 #include "HexTile.h"
+#include <cmath>
+#include <cstdlib>
 
 
 AHexTile::AHexTile()
@@ -77,6 +79,24 @@ void AHexTile::setHighightVisible(bool on)
 void AHexTile::setAttackHighightVisible(bool on)
 {
 	m_tileAttackHighlight->SetVisibility(on, true);
+}
+
+int AHexTile::getDistance(const AHexTile& refHex)
+{
+	for (int i{ 1 };i<100; i++)
+	{
+		if (std::abs(m_axialQ - refHex.m_axialQ) <= i)
+		{
+			if (std::abs(m_axialR - refHex.m_axialR) <= i)
+			{
+				if (std::abs(m_axialS - refHex.m_axialS) <= i)
+				{
+					return i;
+				}
+			}
+		}
+	}
+	return 100;
 }
 
 AHexTile& AHexTile::getHex()

@@ -7,37 +7,30 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
 
-constexpr float baseWait{ 0.5 };
+//constexpr float baseWait{ 0.5 };
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	//PrimaryActorTick.bCanEverTick = true;
 	m_rootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	m_playerCharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	m_arrowMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArrowMesh"));
 	m_playerCharacterMesh->SetupAttachment(m_rootComponent);
 	m_arrowMesh->SetupAttachment(m_rootComponent);
-	m_timeElapsed = 0;
-	m_lerpDuration = baseWait;
-	m_waitTime = baseWait;
-	m_waitTime2 = baseWait;
-	m_index = 999;
-	m_state = IDLE;
-	m_type = CharacterType::ALLY;
-
-	//Stats
-	m_initiative = FMath::RandRange(1, 9);
-	m_movement = 3;
-	m_numberOfAttacks = 1;
-	m_attack = 10;
-	m_maxHealth = 100;
-	resetMoveAtk();
-	resetHealth();
 }
 
+void APlayerCharacter::Init(FPlayerStruct& stats)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Character init()!"));
+	PrimaryActorTick.bCanEverTick = true;
 
-void APlayerCharacter::setStats(PlayerStruct& stats)
+	setStats(stats);
+	resetMoveAtk();
+	resetHealth();	
+}
+
+void APlayerCharacter::setStats(FPlayerStruct& stats)
 {
 	m_initiative = stats.initiative;
 	m_movement = stats.movement;
@@ -46,9 +39,9 @@ void APlayerCharacter::setStats(PlayerStruct& stats)
 	m_maxHealth = stats.maxHealth;
 }
 
-PlayerStruct APlayerCharacter::getStats()
+FPlayerStruct APlayerCharacter::getStats()
 {
-	PlayerStruct playerStruct = { m_initiative, m_movement, m_numberOfAttacks, m_attack, m_maxHealth };
+	FPlayerStruct playerStruct = { m_initiative, m_movement, m_numberOfAttacks, m_attack, m_maxHealth };
 	
 	return playerStruct;
 }
@@ -66,7 +59,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 		
 		if (m_waitTime > 0)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Waiting!"));
 			m_waitTime -= DeltaTime;
 			return;
 		}		
@@ -74,7 +66,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 		if (m_timeElapsed < m_lerpDuration)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Moving!"));
 			SetActorLocation(FMath::Lerp(m_origin, m_destination, m_timeElapsed/m_lerpDuration));	
 			m_timeElapsed += DeltaTime;
 		}
@@ -82,7 +73,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 		else if (m_waitTime2 > 0)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Waiting again!"));
 			m_waitTime2 -= DeltaTime;
 			return;
 		}

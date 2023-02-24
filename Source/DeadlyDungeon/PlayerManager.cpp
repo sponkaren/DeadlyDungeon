@@ -4,14 +4,11 @@
 #include <algorithm>
 #include <array>
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "HexGridManager.h"
 #include "HexTile.h"
+#include "StatGenerator.h"
 #include "PlayerCharacter.h"
-
-//APlayerCharacter* APlayerManager::m_selectedCharacter{};
-//TArray<APlayerCharacter*> APlayerManager::CharacterArray{};
-//int APlayerManager::turnIndex{};
-//int APlayerManager::numberOfCharacters{};
 
 // Sets default values
 APlayerManager::APlayerManager()
@@ -43,9 +40,29 @@ void APlayerManager::spawnHexGridManager()
 	hexManager->thisHexClicked.AddDynamic(this, &APlayerManager::whenHexClicked);
 }
 
-void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
-{	
+void APlayerManager::handlePlayersToSpawn(TArray<FPlayerStruct>& players)
+{
+	
+	for (FPlayerStruct stats : players)
+	{
+		spawnPlayer(stats, hexManager->getNextPlayerSpawn(), false);
+	}
+	
+}
 
+void APlayerManager::spawnEnemies(int difficulty, int numberOfEnemies)
+{
+	for (int i{ 0 }; i < numberOfEnemies; ++i)
+	{
+		FPlayerStruct stats{ StatGenerator::generateStats(difficulty) };
+		spawnPlayer(stats, hexManager->getNextEnemySpawn(), true);
+	}
+}
+
+
+void APlayerManager::spawnPlayer(FPlayerStruct& stats, int hexIndex, bool enemy)
+{	
+	/*
 	if (hexIndex >= hexManager->HexGridArray.Num())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Index out of range, converting to highest possible"));
@@ -59,23 +76,34 @@ void APlayerManager::spawnPlayer(int hexIndex, bool enemy)
 	}
 
 	hexManager->HexGridArray[hexIndex]->setOccupied(true);
+	*/
+
+	FRotator Rotation = GetActorRotation() + FRotator(0,30,0);
 
 	if (enemy)
 	{
 		m_characterToSpawn = m_enemyCharacter;
+		Rotation += FRotator(0, 180, 0);
 	}
 	else
 	{
 		m_characterToSpawn = m_playerCharacter;
 	}
 
-	FRotator Rotation = GetActorRotation();	
 
 	FVector Location = hexManager->HexGridArray[hexIndex]->getLocation();
 	Location += FVector(0, 0, 7);
 
-	APlayerCharacter* newPlayer = CharacterArray.Emplace_GetRef(GetWorld()->SpawnActor<APlayerCharacter>
-		(m_characterToSpawn, Location, Rotation));
+	FTransform SpawnTransform(Rotation, Location);
+
+	APlayerCharacter* newPlayer = GetWorld()->SpawnActorDeferred<APlayerCharacter>(m_characterToSpawn, SpawnTransform);
+	newPlayer->Init(stats);
+	newPlayer->FinishSpawning(SpawnTransform);
+
+	CharacterArray.Emplace(newPlayer);
+
+	//APlayerCharacter* newPlayer = CharacterArray.Emplace_GetRef(GetWorld()->SpawnActor<APlayerCharacter>
+		//(m_characterToSpawn, Location, Rotation));
 
 	++numberOfCharacters;
 
@@ -107,13 +135,88 @@ void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
 	character->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character->m_selectedAnim, true);
 	APlayerManager::storeSelectedCharacter(character);
 	hexManager->highlightTiles(character->getHexLocation());
-}
+	
+	
+	if (character->m_type == CharacterType::ENEMY)
+	{
+		startAI();
+		/*
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("The beginning of AI!"));
+		int characterHex{ character->getHexLocation() };
+		TArray<int> characterMovement;
+		TArray<int> targetLocations;
+		
+		for (APlayerCharacter* possibleTarget : CharacterArray)
+		{
+			if (possibleTarget->m_type == CharacterType::ALLY)
+			{
+				targetLocations.Emplace(possibleTarget->getHexLocation());
+			}
+		}
 
+		int targetHex = hexManager->findClosestTarget(characterHex, targetLocations);
+		hexManager->calculateMovement(characterMovement, targetHex, characterHex, character->m_movementLeft);
+
+		movePlayerCharacter(characterMovement[0]);
+		*/
+	}	
+}
 
 APlayerCharacter* APlayerManager::getSelectedCharacer()
 {
 	return m_selectedCharacter;
 }
+
+void APlayerManager::startAI()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("The beginning of AI!"));
+	int characterHex{m_selectedCharacter->getHexLocation() };
+	TArray<int> characterMovement;
+	TArray<int> targetLocations;
+
+	for (APlayerCharacter* possibleTarget : CharacterArray)
+	{
+		if (possibleTarget->m_type == CharacterType::ALLY)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
+				possibleTarget->getHexLocation()));
+
+			targetLocations.Emplace(possibleTarget->getHexLocation());
+		}
+	}
+
+	int targetHex = hexManager->findClosestTarget(characterHex, targetLocations);
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
+		targetHex));
+
+	hexManager->calculateMovement(characterMovement, targetHex, characterHex, m_selectedCharacter->m_movementLeft);
+	
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Number of moves(pm): %i"),
+		characterMovement.Num()));
+
+	moveEnemy(characterMovement);
+}
+
+void APlayerManager::moveEnemy(const TArray<int>& movements) 
+{
+	
+	int move{};
+
+	for (int i{0};i<movements.Num();++i)
+	{	
+		move = movements[i];
+		FVector destination = hexManager->HexGridArray[move]->getLocation() + FVector(0, 0, 7);
+		m_selectedCharacter->moveToHex(destination);
+				
+
+	}
+	hexManager->highlightsOff();
+	hexManager->HexGridArray[m_selectedCharacter->getHexLocation()]->setOccupied(false);
+	hexManager->HexGridArray[move]->setOccupied(true);
+	m_selectedCharacter->setHexLocation(move);
+}
+
 
 void APlayerManager::movePlayerCharacter(int destIndex)
 {

@@ -12,6 +12,8 @@ FVector AxialPixelConversion::axialToPixel(int r, int q)
     return FVector(x, y, 0);
 }
 
+
+
 AxialPixelConversion::AxialPixelConversion()
 {
 

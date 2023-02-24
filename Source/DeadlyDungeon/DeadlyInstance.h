@@ -29,7 +29,10 @@ protected:
 public: 
 
 	UFUNCTION(BlueprintCallable, Category = "Game Manager")
-	void Setup();
+	void MenuSetup();
+
+	UFUNCTION(BlueprintCallable, Category = "Game Manager")
+	void DungeonSetup();
 
 	UPROPERTY(BlueprintReadOnly)
 	FString SaveGameSlotName;

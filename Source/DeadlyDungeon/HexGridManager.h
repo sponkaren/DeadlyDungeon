@@ -45,6 +45,16 @@ public:
 	void highlightTiles(int hexIndex);
 	void highlightAttackTiles(int hexIndex);
 	void highlightsOff();
+	int getNextPlayerSpawn();
+	int getNextEnemySpawn();
+	AHexTile* findHexByAxial(int Q, int R);
+
+	int findClosestTarget(int hexIndex, const TArray<int>& targets);
+
+	void calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft);
+
+	int getAttractiveness(AHexTile* start, AHexTile* next, AHexTile* end);
+
 
 protected:
 	// Called when the game starts or when spawned

@@ -133,3 +133,128 @@ void AHexGridManager::highlightsOff()
 		hex->setAttackHighightVisible(false);
 	}
 }
+
+AHexTile* AHexGridManager::findHexByAxial(int Q, int R)
+{
+	for (AHexTile* hex : HexGridArray)
+	{
+		if (hex->m_axialQ == Q && hex->m_axialR == R)
+		{
+			return hex;
+		}
+	}	
+	return nullptr;
+}
+
+int AHexGridManager::getNextPlayerSpawn()
+{
+	for(int i{ 0 };i<HexGridArray.Num();i+=m_gridHeight)
+	{
+		if (!HexGridArray[i]->getOccupied())
+		{
+			HexGridArray[i]->setOccupied(true);
+			return i;
+		}
+	}
+	return 999;
+}
+
+int AHexGridManager::getNextEnemySpawn()
+{
+	for (int i{ m_gridHeight-1 }; i < HexGridArray.Num(); i += m_gridHeight)
+	{
+		if (!HexGridArray[i]->getOccupied())
+		{
+			HexGridArray[i]->setOccupied(true);
+			return i;
+		}
+	}
+	return 999;
+}
+
+int AHexGridManager::findClosestTarget(int hexIndex, const TArray<int>& targets)
+{
+	int shortestDist{999};
+	int closestIndex{};
+
+	for (int possibleTarget : targets)
+	{
+		int distance = HexGridArray[hexIndex]->getDistance(*HexGridArray[possibleTarget]);
+		if (distance < shortestDist)
+		{
+			shortestDist = distance;
+			closestIndex = possibleTarget;
+		}
+	}
+	return closestIndex;
+}
+
+void AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft)
+{
+
+	if (checkIfAdjacent(HexGridArray[hexIndex], HexGridArray[targetHex]))
+	{
+		return;
+	}
+
+	int q{ HexGridArray[hexIndex]->m_axialQ };
+	int r{ HexGridArray[hexIndex]->m_axialR };
+
+	for (int i{ 0 }; i < movementLeft; ++i)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Number of moves(hm): %i"),
+			movementLeft));	
+		int attractiveness{0};
+		bool nextFound{false};
+		int nextIndex{};
+
+		for (AHexTile* hex : HexGridArray)
+		{
+			if (checkIfAdjacent(findHexByAxial(q,r), hex) && hex->getOccupied() == false)
+			{
+				bool traveled = false;
+
+				for (int destination : movementArray)
+				{
+					if (hex->m_index == destination)
+					{
+						traveled = true;
+					}
+				}
+				if (!traveled)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Untraveled!"));
+					int newAttr = getAttractiveness(findHexByAxial(q, r), hex, HexGridArray[targetHex]);
+					if (newAttr > attractiveness)
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Good looking!"));
+						attractiveness = newAttr;
+						nextIndex = hex->m_index;
+						nextFound = true;
+					}
+				}
+			}
+		}
+		if (nextFound)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Found one!"));
+			movementArray.Emplace(nextIndex);
+			q = HexGridArray[nextIndex]->m_axialQ;
+			r = HexGridArray[nextIndex]->m_axialR;
+		}
+	}	
+}
+
+int AHexGridManager::getAttractiveness(AHexTile* start, AHexTile* next, AHexTile* end)
+{
+	int diffQ = std::abs(start->getAxialQ() - end->getAxialQ());
+	int diffR = std::abs(start->getAxialR() - end->getAxialR());	
+	int diffS = std::abs(start->getAxialS() - end->getAxialS());
+
+	int ndiffQ = std::abs(next->getAxialQ() - end->getAxialQ());
+	int ndiffR = std::abs(next->getAxialR() - end->getAxialR());
+	int ndiffS = std::abs(next->getAxialS() - end->getAxialS());
+
+	return diffQ + diffR + diffS - ndiffQ - ndiffR - ndiffS;
+
+}

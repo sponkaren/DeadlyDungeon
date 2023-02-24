@@ -8,7 +8,7 @@
 #include "Kismet/Gameplaystatics.h"
 
 
-void UDeadlyInstance::Setup()
+void UDeadlyInstance::MenuSetup()
 {   
     SaveGameSlotName = "DeadlySlot";
     LoadGame();    
@@ -20,26 +20,34 @@ void UDeadlyInstance::Setup()
         menuManager->CharacterCreated.AddDynamic(this, &UDeadlyInstance::SaveCharacter);
         menuManager->getHex();
 
-        if (SaveGameObject->One == true)
+        if (SaveGameObject->alivePlayers.Num() > 0)
         {
-            menuManager->spawnAlivePlayer(SaveGameObject->characterOne, 0);
-        }
-        if (SaveGameObject->Two == true)
-        {
-            menuManager->spawnAlivePlayer(SaveGameObject->characterTwo, 1);
-        }
-        if (SaveGameObject->Three == true)
-        {
-            menuManager->spawnAlivePlayer(SaveGameObject->characterThree, 2);
-        }
-        if (SaveGameObject->Four == true)
-        {
-            menuManager->spawnAlivePlayer(SaveGameObject->characterFour, 3);
+            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("m_maxHealth: %f"), 
+            SaveGameObject->alivePlayers[0].maxHealth));
+
+            menuManager->spawnAlivePlayers(SaveGameObject->alivePlayers);
         }
     }
 
     //playerManager = UGameplayStatics::GetActorOfClass(GetWorld(), AMenuManager::StaticClass());
     
+}
+
+void UDeadlyInstance::DungeonSetup()
+{
+    SaveGameSlotName = "DeadlySlot";
+    LoadGame();
+    playerActor = UGameplayStatics::GetActorOfClass(GetWorld(), APlayerManager::StaticClass());
+
+    if (playerActor)
+    {
+        playerManager = Cast<APlayerManager>(playerActor);
+        if (SaveGameObject->alivePlayers.Num() > 0)
+        {
+            playerManager->handlePlayersToSpawn(SaveGameObject->alivePlayers);
+            playerManager->spawnEnemies(1,4);
+        }
+    }
 }
 
 void UDeadlyInstance::LoadGame()
@@ -80,33 +88,16 @@ void UDeadlyInstance::SaveGame()
 }
 
 void UDeadlyInstance::SaveCharacter(APlayerCharacter* character)
-{
+{ 
+    SaveGameObject->alivePlayers.Emplace(character->getStats());
 
-    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Save that shit!"));
- 
-    //When arrays don't cooperate..
-    if (SaveGameObject->One == false)
-    {
-        SaveGameObject->characterOne = character->getStats();
-        SaveGameObject->One = true;
-    }
-    else if (SaveGameObject->Two == false)
-    {
-        SaveGameObject->characterTwo = character->getStats();
-        SaveGameObject->Two = true;
-    }
-    else if (SaveGameObject->Three == false)
-    {
-        SaveGameObject->characterThree = character->getStats();
-        SaveGameObject->Three = true;
-    }
-    else if (SaveGameObject->Four == false)
-    {
-        SaveGameObject->characterFour = character->getStats();
-        SaveGameObject->Four = true;
-    }
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("m_maxHealth: %f"),
+        SaveGameObject->alivePlayers[0].maxHealth));
 
     bool IsSaved = UGameplayStatics::SaveGameToSlot(SaveGameObject, SaveGameSlotName, 0);
+
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("m_maxHealth: %f"),
+        SaveGameObject->alivePlayers[0].maxHealth));
 
     LogIfGameWasSavedOrNot(IsSaved);
 }
