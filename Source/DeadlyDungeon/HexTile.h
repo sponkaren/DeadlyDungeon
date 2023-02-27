@@ -63,6 +63,10 @@ public:
 	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
 	int m_index{};
 
+	int movePrio{-1};
+
+	bool moveBlock{ false };
+
 	// Sets default values for this actor's properties
 	AHexTile();
 

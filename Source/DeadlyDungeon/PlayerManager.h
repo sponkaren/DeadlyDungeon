@@ -47,6 +47,8 @@ protected:
 
 	int turnIndex;
 
+	TArray<int> characterMovement;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -72,7 +74,7 @@ public:
 
 	void movePlayerCharacter(int destinationHexIndex);
 
-	void moveEnemy(const TArray<int>& movements);
+	void moveEnemy(int movement);
 
 	void occupiedHexClicked(int hexIndex);
 

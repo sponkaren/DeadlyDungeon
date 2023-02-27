@@ -5,6 +5,8 @@
 #include <array>
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/LatentActionManager.h"
+#include "assert.h"
 #include "HexGridManager.h"
 #include "HexTile.h"
 #include "StatGenerator.h"
@@ -58,7 +60,6 @@ void APlayerManager::spawnEnemies(int difficulty, int numberOfEnemies)
 		spawnPlayer(stats, hexManager->getNextEnemySpawn(), true);
 	}
 }
-
 
 void APlayerManager::spawnPlayer(FPlayerStruct& stats, int hexIndex, bool enemy)
 {	
@@ -129,6 +130,7 @@ void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
 		lastClicked->setArrowOn(false);
 		hexManager->highlightsOff();
 	}
+
 	lastClicked = character;
 	character->setArrowOn(true);
 	character->resetMoveAtk();
@@ -140,25 +142,6 @@ void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
 	if (character->m_type == CharacterType::ENEMY)
 	{
 		startAI();
-		/*
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("The beginning of AI!"));
-		int characterHex{ character->getHexLocation() };
-		TArray<int> characterMovement;
-		TArray<int> targetLocations;
-		
-		for (APlayerCharacter* possibleTarget : CharacterArray)
-		{
-			if (possibleTarget->m_type == CharacterType::ALLY)
-			{
-				targetLocations.Emplace(possibleTarget->getHexLocation());
-			}
-		}
-
-		int targetHex = hexManager->findClosestTarget(characterHex, targetLocations);
-		hexManager->calculateMovement(characterMovement, targetHex, characterHex, character->m_movementLeft);
-
-		movePlayerCharacter(characterMovement[0]);
-		*/
 	}	
 }
 
@@ -169,52 +152,49 @@ APlayerCharacter* APlayerManager::getSelectedCharacer()
 
 void APlayerManager::startAI()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("The beginning of AI!"));
 	int characterHex{m_selectedCharacter->getHexLocation() };
-	TArray<int> characterMovement;
+	characterMovement.Empty();
 	TArray<int> targetLocations;
 
 	for (APlayerCharacter* possibleTarget : CharacterArray)
 	{
 		if (possibleTarget->m_type == CharacterType::ALLY)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
-				possibleTarget->getHexLocation()));
-
 			targetLocations.Emplace(possibleTarget->getHexLocation());
 		}
 	}
 
 	int targetHex = hexManager->findClosestTarget(characterHex, targetLocations);
-
+	
+	
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
 		targetHex));
+	
+	assert(characterMovement.Num() > 0);
 
-	hexManager->calculateMovement(characterMovement, targetHex, characterHex, m_selectedCharacter->m_movementLeft);
+	if (targetHex >= 0) 
+	{
+		hexManager->calculateMovement(characterMovement, targetHex, characterHex, m_selectedCharacter->m_movementLeft);
+	}
 	
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Number of moves(pm): %i"),
 		characterMovement.Num()));
 
-	moveEnemy(characterMovement);
+	if (characterMovement.Num() > 0)
+	{
+		moveEnemy(characterMovement[0]);
+	}
 }
 
-void APlayerManager::moveEnemy(const TArray<int>& movements) 
+void APlayerManager::moveEnemy(int movement) 
 {
-	
-	int move{};
-
-	for (int i{0};i<movements.Num();++i)
-	{	
-		move = movements[i];
-		FVector destination = hexManager->HexGridArray[move]->getLocation() + FVector(0, 0, 7);
-		m_selectedCharacter->moveToHex(destination);
-				
-
-	}
+	characterMovement.RemoveAt(0);
+	FVector destination = hexManager->HexGridArray[movement]->getLocation() + FVector(0, 0, 7);
+	m_selectedCharacter->moveToHex(destination);
 	hexManager->highlightsOff();
 	hexManager->HexGridArray[m_selectedCharacter->getHexLocation()]->setOccupied(false);
-	hexManager->HexGridArray[move]->setOccupied(true);
-	m_selectedCharacter->setHexLocation(move);
+	hexManager->HexGridArray[movement]->setOccupied(true);
+	m_selectedCharacter->setHexLocation(movement);
 }
 
 
@@ -390,6 +370,12 @@ void APlayerManager::selectedIdle()
 
 void APlayerManager::setIdle(APlayerCharacter* character)
 {
+	if (character->m_type == CharacterType::ENEMY && characterMovement.Num() > 0)
+	{
+		moveEnemy(characterMovement[0]);
+		return;
+	}	
+
 	hexManager->highlightsOff();
 	character->m_state = character->IDLE;
 

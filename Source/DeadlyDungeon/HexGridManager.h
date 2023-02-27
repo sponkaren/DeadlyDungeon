@@ -23,6 +23,9 @@ protected:
 	int32 m_gridHeight;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid Layout")
+	int32 numberOfTiles;
+
+	UPROPERTY(EditAnywhere, Category = "HexGrid Layout")
 	TSubclassOf<AHexTile> m_grassHexTile;
 
 	UPROPERTY(EditAnywhere, Category = "HexGrid Layout")
@@ -54,6 +57,10 @@ public:
 	void calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft);
 
 	int getAttractiveness(AHexTile* start, AHexTile* next, AHexTile* end);
+
+	void setPriorities(int hexIndex);
+	void clearPriorities();
+	int getTargetPriority(int hexIndex, int targetIndex);
 
 
 protected:
