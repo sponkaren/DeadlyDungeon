@@ -14,11 +14,13 @@ struct FPlayerStruct
 {
 	GENERATED_BODY()
 public:
+	PlayerCharacterClass characterClass;
 	int initiative;
 	int movement;
 	float attack;
 	int numberOfAttacks;
 	float maxHealth;
+	int range;
 };
 
 
@@ -29,6 +31,7 @@ enum class PlayerCharacterClass : uint8
 	WARRIOR,
 	HEALER,
 	MAGE,
+	RANGER,
 	MAX UMETA(Hidden)
 };
 
@@ -61,7 +64,7 @@ public:
 
 	//personal
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-	PlayerCharacterClass m_playerCharacterClass;
+	PlayerCharacterClass m_characterClass;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 	int m_initiative;
@@ -77,6 +80,9 @@ public:
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 	float m_maxHealth;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+	int m_range;
 	//end of stats
 
 

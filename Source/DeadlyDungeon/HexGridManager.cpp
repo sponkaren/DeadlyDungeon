@@ -112,12 +112,12 @@ void AHexGridManager::highlightTiles(int hexIndex)
 	}
 }
 
-void AHexGridManager::highlightAttackTiles(int hexIndex)
+void AHexGridManager::highlightAttackTiles(int hexIndex, int range)
 {
 	
 	for (AHexTile* hex : HexGridArray)
 	{
-		if (checkIfAdjacent(hex, HexGridArray[hexIndex])
+		if (checkIfAdjacent(hex, HexGridArray[hexIndex], range)
 			&& hex != HexGridArray[hexIndex]
 			&& hex->getOccupied())
 		{
@@ -361,6 +361,9 @@ void AHexGridManager::setPriorities(int targetHex, int range, bool rangeCheck)
 
 			}
 		}
+
+		range = 1;
+
 		if (checked == numberOfTiles)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("All checked!"));

@@ -96,10 +96,10 @@ public:
 	void setNextTurn();
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
-	bool setAttacking();
+	bool setAttacking(bool ally=false);
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
-	void selectedIdle();
+	void selectedIdle(bool ally=false);
 
 	UFUNCTION()
 	void setIdle(APlayerCharacter* character);

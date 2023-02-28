@@ -46,7 +46,7 @@ public:
 
 	bool checkIfAdjacent(AHexTile* h1, AHexTile* h2, int range=1);
 	void highlightTiles(int hexIndex);
-	void highlightAttackTiles(int hexIndex);
+	void highlightAttackTiles(int hexIndex, int range=1);
 	void highlightsOff();
 	int getNextPlayerSpawn();
 	int getNextEnemySpawn();

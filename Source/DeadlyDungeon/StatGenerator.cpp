@@ -2,21 +2,55 @@
 
 
 #include "StatGenerator.h"
+#include "Math/UnrealMathUtility.h"
 
 FPlayerStruct StatGenerator::generateStats(int level)
 {
-	FPlayerStruct stats = {
-		//int initiative;
-		5,
-		//int movement;
-		3,
-		//float attack;
-		10,
-		//int numberOfAttacks;
-		1,
-		//float maxHealth;
-		100
-	};
+	int randomStruct = FMath::RandRange(1, 2);
+	FPlayerStruct stats;
+	
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Rand: %i"),
+		randomStruct));
+
+	switch (randomStruct)
+	{
+	case 1:
+		//warrior
+		stats = {
+			PlayerCharacterClass::WARRIOR,
+			//int initiative
+			5,
+			//int movement
+			3,
+			//float attack
+			10,
+			//int numberOfAttacks
+			1,
+			//float maxHealth
+			100,
+			//int range
+			1
+		};
+		break;
+	case 2:
+		//ranger
+		stats = {
+			PlayerCharacterClass::RANGER,
+			//int initiative
+			5,
+			//int movement
+			3,
+			//float attack
+			6,
+			//int numberOfAttacks
+			1,
+			//float maxHealth
+			80,
+			//int range
+			2
+		};
+		break;
+	}
 
 	return stats;
 }

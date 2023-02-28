@@ -32,16 +32,18 @@ void APlayerCharacter::Init(FPlayerStruct& stats)
 
 void APlayerCharacter::setStats(FPlayerStruct& stats)
 {
+	m_characterClass = stats.characterClass;
 	m_initiative = stats.initiative;
 	m_movement = stats.movement;
 	m_numberOfAttacks = stats.numberOfAttacks;
 	m_attack = stats.attack;
 	m_maxHealth = stats.maxHealth;
+	m_range = stats.range;
 }
 
 FPlayerStruct APlayerCharacter::getStats()
 {
-	FPlayerStruct playerStruct = { m_initiative, m_movement, m_numberOfAttacks, m_attack, m_maxHealth };
+	FPlayerStruct playerStruct = { m_characterClass, m_initiative, m_movement, m_numberOfAttacks, m_attack, m_maxHealth, m_range };
 	
 	return playerStruct;
 }

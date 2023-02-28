@@ -166,10 +166,11 @@ void APlayerManager::startAI()
 
 	if (targetLocations.Num() == 0)
 	{
+		hexManager->highlightsOff();
 		return;
 	}
 
-	int targetHex = hexManager->findClosestTarget(characterHex, targetLocations);
+	int targetHex = hexManager->findClosestTarget(characterHex, targetLocations, m_selectedCharacter->m_range);
 	
 	
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
@@ -177,27 +178,24 @@ void APlayerManager::startAI()
 
 	if (targetHex >= 0) 
 	{
-		m_selectedCharacter->AIAttack = hexManager->calculateMovement(characterMovement, targetHex, characterHex, m_selectedCharacter->m_movementLeft);
+		m_selectedCharacter->AIAttack = hexManager->calculateMovement(characterMovement, targetHex, characterHex, m_selectedCharacter->m_movementLeft, m_selectedCharacter->m_range);
 		m_selectedCharacter->AITarget = targetHex;
 	}
 	
 	else if (targetHex < 0)
 	{
-		targetHex = hexManager->findClosestRangeTarget(characterHex, targetLocations);
+		targetHex = hexManager->findClosestRangeTarget(characterHex, targetLocations, m_selectedCharacter->m_range);
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
 			targetHex));
 
-		hexManager->calculateMoveTowards(characterMovement, targetHex, characterHex, m_selectedCharacter->m_movementLeft);
+		hexManager->calculateMoveTowards(characterMovement, targetHex, characterHex, m_selectedCharacter->m_movementLeft, m_selectedCharacter->m_range);
 	}
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Number of moves(pm): %i"),
 		characterMovement.Num()));
 
-	if (characterMovement.Num() > 0)
-	{
-		moveEnemy(characterMovement[0]);
-	}
+	setIdle(m_selectedCharacter);
 }
 
 void APlayerManager::moveEnemy(int movement) 
@@ -366,8 +364,15 @@ void APlayerManager::setNextTurn()
 	}
 }
 
-bool APlayerManager::setAttacking()
+bool APlayerManager::setAttacking(bool ally)
 {
+	if (ally)
+	{
+		if (m_selectedCharacter->m_type == CharacterType::ENEMY)
+		{
+			return false;
+		}
+	}
 	if (m_selectedCharacter)
 	{
 		if (m_selectedCharacter->rdyToAttack())
@@ -383,9 +388,12 @@ bool APlayerManager::setAttacking()
 	return false;
 }
 
-void APlayerManager::selectedIdle()
+void APlayerManager::selectedIdle(bool ally)
 {
-	m_selectedCharacter->startIdling();
+	if (ally)
+	{
+		m_selectedCharacter->startIdling();
+	}
 }
 
 void APlayerManager::setIdle(APlayerCharacter* character)
@@ -421,7 +429,7 @@ void APlayerManager::setIdle(APlayerCharacter* character)
 		}
 		else if (character->AIAttack == false)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Not set to attack!"));
+			m_selectedCharacter->m_movementLeft = 0;
 		}		
 	}	
 
@@ -442,7 +450,8 @@ void APlayerManager::setIdle(APlayerCharacter* character)
 
 bool APlayerManager::validateMovement(int hexIndex)
 {
-	if (hexManager->checkIfAdjacent(hexManager->HexGridArray[hexIndex], hexManager->HexGridArray[getSelectedCharacer()->getHexLocation()]))
+	if (hexManager->checkIfAdjacent(hexManager->HexGridArray[hexIndex], hexManager->HexGridArray[getSelectedCharacer()->getHexLocation()])
+		&& m_selectedCharacter->m_type == CharacterType::ALLY)
 	{
 		return true;
 	}
@@ -452,7 +461,7 @@ bool APlayerManager::validateMovement(int hexIndex)
 
 bool APlayerManager::validateAttack(int hexIndex)
 {
-	if (hexManager->checkIfAdjacent(hexManager->HexGridArray[hexIndex], hexManager->HexGridArray[getSelectedCharacer()->getHexLocation()]))
+	if (hexManager->checkIfAdjacent(hexManager->HexGridArray[hexIndex], hexManager->HexGridArray[getSelectedCharacer()->getHexLocation()]), m_selectedCharacter->m_range)
 	{
 		return true;
 	}
