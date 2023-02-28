@@ -227,6 +227,7 @@ void APlayerCharacter::resetMoveAtk()
 {
 	m_movementLeft = m_movement;
 	m_numberOfAttacksLeft = m_numberOfAttacks;
+	AIAttack = false;
 }
 
 void APlayerCharacter::resetHealth()

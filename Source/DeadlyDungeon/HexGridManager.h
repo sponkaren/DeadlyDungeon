@@ -44,7 +44,7 @@ public:
 	UFUNCTION()
 	void whenHexClicked(AHexTile* hex);
 
-	bool checkIfAdjacent(AHexTile* h1, AHexTile* h2);
+	bool checkIfAdjacent(AHexTile* h1, AHexTile* h2, int range=1);
 	void highlightTiles(int hexIndex);
 	void highlightAttackTiles(int hexIndex);
 	void highlightsOff();
@@ -52,13 +52,17 @@ public:
 	int getNextEnemySpawn();
 	AHexTile* findHexByAxial(int Q, int R);
 
-	int findClosestTarget(int hexIndex, const TArray<int>& targets);
+	int findClosestTarget(int hexIndex, const TArray<int>& targets, int range=1);
+	int findClosestRangeTarget(int hexIndex, const TArray<int>& targets, int range = 1);
 
-	void calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft);
+	bool calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range=1);
+	void calculateMoveTowards(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range = 1);
+
+	void movementCalc(TArray<int>& movementArray, int hexIndex, int movementLeft, int& locPrio);
 
 	int getAttractiveness(AHexTile* start, AHexTile* next, AHexTile* end);
 
-	void setPriorities(int hexIndex);
+	void setPriorities(int hexIndex, int range=1, bool rangeCheck=false);
 	void clearPriorities();
 	int getTargetPriority(int hexIndex, int targetIndex);
 

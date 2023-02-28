@@ -164,19 +164,33 @@ void APlayerManager::startAI()
 		}
 	}
 
+	if (targetLocations.Num() == 0)
+	{
+		return;
+	}
+
 	int targetHex = hexManager->findClosestTarget(characterHex, targetLocations);
 	
 	
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
 		targetHex));
-	
-	assert(characterMovement.Num() > 0);
 
 	if (targetHex >= 0) 
 	{
-		hexManager->calculateMovement(characterMovement, targetHex, characterHex, m_selectedCharacter->m_movementLeft);
+		m_selectedCharacter->AIAttack = hexManager->calculateMovement(characterMovement, targetHex, characterHex, m_selectedCharacter->m_movementLeft);
+		m_selectedCharacter->AITarget = targetHex;
 	}
 	
+	else if (targetHex < 0)
+	{
+		targetHex = hexManager->findClosestRangeTarget(characterHex, targetLocations);
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
+			targetHex));
+
+		hexManager->calculateMoveTowards(characterMovement, targetHex, characterHex, m_selectedCharacter->m_movementLeft);
+	}
+
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Number of moves(pm): %i"),
 		characterMovement.Num()));
 
@@ -225,8 +239,14 @@ void APlayerManager::occupiedHexClicked(int hexIndex)
 
 void APlayerManager::characterClicked(APlayerCharacter* character)
 {
+	/*
 	if (character->m_currentHealth <= 0)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Overkill!"));
 		return;
+	}
+	*/
+	
 
 	if (m_selectedCharacter->getAttacking())
 	{
@@ -370,16 +390,46 @@ void APlayerManager::selectedIdle()
 
 void APlayerManager::setIdle(APlayerCharacter* character)
 {
-	if (character->m_type == CharacterType::ENEMY && characterMovement.Num() > 0)
+	if (character->m_type == CharacterType::ENEMY)
 	{
-		moveEnemy(characterMovement[0]);
-		return;
+		if (characterMovement.Num() > 0)
+		{
+			moveEnemy(characterMovement[0]);
+			return;
+		}
+		
+		character->m_state = character->IDLE;
+
+		if (character->AIAttack == true)
+		{			
+			if (setAttacking())
+			{
+				for (APlayerCharacter* possibleTarget : CharacterArray)
+				{
+					if (possibleTarget->getHexLocation() == character->AITarget)
+					{
+						for (int i{ 0 }; i < character->m_numberOfAttacks; ++i);
+						characterClicked(possibleTarget);
+						break;
+					}
+				}
+			}
+			else
+			{
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Can't set attacking!"));
+			}
+		}
+		else if (character->AIAttack == false)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Not set to attack!"));
+		}		
 	}	
+
 
 	hexManager->highlightsOff();
 	character->m_state = character->IDLE;
 
-	if (character->m_movementLeft > 0)
+	if (character->m_type == CharacterType::ALLY && character->m_movementLeft > 0)
 	{
 		character->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character->m_selectedAnim, true);
 		hexManager->highlightTiles(character->getHexLocation());

@@ -40,7 +40,7 @@ enum class CharacterType : uint8
 	MAX UMETA (Hidden)
 };
 
-constexpr float baseWait{ 0.5 };
+constexpr float baseWait{ 0.1 };
 
 UCLASS()
 class DEADLYDUNGEON_API APlayerCharacter : public APawn
@@ -88,6 +88,12 @@ public:
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 	int m_numberOfAttacksLeft;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+	bool AIAttack{ false };
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+	int AITarget{0};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 	CharacterType m_type {CharacterType::ALLY};

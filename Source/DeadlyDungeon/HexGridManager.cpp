@@ -65,7 +65,6 @@ void AHexGridManager::BeginPlay()
 
 }
 
-
 void AHexGridManager::whenHexClicked(AHexTile* hex)
 {
 	if (hex->m_tileType == EHexTileType::MENU)
@@ -86,7 +85,7 @@ void AHexGridManager::whenHexClicked(AHexTile* hex)
 	thisHexClicked.Broadcast(hex);
 }
 
-bool AHexGridManager::checkIfAdjacent(AHexTile* h1, AHexTile* h2)
+bool AHexGridManager::checkIfAdjacent(AHexTile* h1, AHexTile* h2, int range)
 {
 	int diffR = std::abs(h1->getAxialR() - h2->getAxialR());
 	int diffQ = std::abs(h1->getAxialQ() - h2->getAxialQ());
@@ -97,7 +96,7 @@ bool AHexGridManager::checkIfAdjacent(AHexTile* h1, AHexTile* h2)
 		return false;
 	}
 
-	return((diffR <= 1) && (diffQ <= 1) && (diffS <= 1));
+	return((diffR <= range) && (diffQ <= range) && (diffS <= range));
 }
 
 void AHexGridManager::highlightTiles(int hexIndex) 
@@ -150,7 +149,7 @@ AHexTile* AHexGridManager::findHexByAxial(int Q, int R)
 
 int AHexGridManager::getNextPlayerSpawn()
 {
-	for(int i{ 0 };i<HexGridArray.Num();i+=m_gridHeight*2)
+	for(int i{(m_gridWidth/4)*m_gridHeight};i<HexGridArray.Num();i+=m_gridHeight)
 	{
 		if (!HexGridArray[i]->getOccupied())
 		{
@@ -163,7 +162,7 @@ int AHexGridManager::getNextPlayerSpawn()
 
 int AHexGridManager::getNextEnemySpawn()
 {
-	for (int i{ m_gridHeight-1 }; i < HexGridArray.Num(); i += m_gridHeight)
+	for (int i{ ((m_gridWidth / 4) * m_gridHeight)-1}; i < HexGridArray.Num(); i += m_gridHeight)
 	{
 		if (!HexGridArray[i]->getOccupied())
 		{
@@ -182,7 +181,7 @@ int AHexGridManager::getNextEnemySpawn()
 	return 999;
 }
 
-int AHexGridManager::findClosestTarget(int hexIndex, const TArray<int>& targets)
+int AHexGridManager::findClosestTarget(int hexIndex, const TArray<int>& targets, int range)
 {
 	int targetIndex{-1};
 	int lowestValidPrio{999};
@@ -193,8 +192,8 @@ int AHexGridManager::findClosestTarget(int hexIndex, const TArray<int>& targets)
 
 		int prio = HexGridArray[hexIndex]->movePrio;
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Prio: %i"),
-			prio));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Prio: %i"),
+		//	prio));
 
 		//target is self
 		if (prio == 0)
@@ -205,23 +204,71 @@ int AHexGridManager::findClosestTarget(int hexIndex, const TArray<int>& targets)
 		else if (prio > 0 && prio < lowestValidPrio)
 		{
 			lowestValidPrio = prio;
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Set lowest prio: %i"),
-				lowestValidPrio));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Set lowest prio: %i"),
+			//	lowestValidPrio));
 			targetIndex = HexGridArray[possibleTarget]->m_index;
 		}
 	}
 	return targetIndex;
 }
 
-void AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft)
+int AHexGridManager::findClosestRangeTarget(int hexIndex, const TArray<int>& targets, int range)
 {
-	setPriorities(targetHex);
+	
+	int targetIndex{ -1 };
+	int closestRange{ 999 };
+
+	for (int possibleTarget : targets)
+	{
+		int range = HexGridArray[hexIndex]->getDistance(*HexGridArray[possibleTarget]);
+		if (range < closestRange)
+		{
+			closestRange = range;
+			targetIndex = HexGridArray[possibleTarget]->m_index;
+		}
+	}
+
+	return targetIndex;
+}
+
+bool AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range)
+{
+	setPriorities(targetHex, range);
 
 	int locPrio = HexGridArray[hexIndex]->movePrio;
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Set locPrio: %i"),
-		locPrio));
+	//Already in prime position, no need for calculations
+	if (locPrio == 1)
+	{
+		clearPriorities();
+		return true;
+	}
 
+	movementCalc(movementArray, hexIndex, movementLeft, locPrio);
+	clearPriorities();
+	
+	if (locPrio == 1)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Returning true!"));
+		return true;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Returning false!"));
+		return false;
+	}
+}
+
+void AHexGridManager::calculateMoveTowards(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range)
+{
+	setPriorities(targetHex, range, true);
+	int locPrio = HexGridArray[hexIndex]->movePrio;
+
+	movementCalc(movementArray, hexIndex, movementLeft, locPrio);
+}
+
+void AHexGridManager::movementCalc(TArray<int>& movementArray, int hexIndex, int movementLeft, int& locPrio)
+{
 	int q{ HexGridArray[hexIndex]->m_axialQ };
 	int r{ HexGridArray[hexIndex]->m_axialR };
 
@@ -246,11 +293,11 @@ void AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHe
 				if (!traveled)
 				{
 					int destPrio = hex->movePrio;
-					if (destPrio >0 && destPrio < locPrio)
+					if (destPrio > 0 && destPrio < locPrio)
 					{
 						locPrio = destPrio;
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Set new locPrio: %i"),
-							locPrio));
+						//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Set new locPrio: %i"),
+							//locPrio));
 						nextIndex = hex->m_index;
 						nextFound = true;
 					}
@@ -259,14 +306,13 @@ void AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHe
 		}
 		if (nextFound)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Adding index: %i"),
-				nextFound));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Adding index: %i"),
+			//	nextIndex));
 			movementArray.Emplace(nextIndex);
 			q = HexGridArray[nextIndex]->m_axialQ;
 			r = HexGridArray[nextIndex]->m_axialR;
 		}
 	}
-	clearPriorities();
 }
 
 int AHexGridManager::getAttractiveness(AHexTile* start, AHexTile* next, AHexTile* end)
@@ -283,7 +329,7 @@ int AHexGridManager::getAttractiveness(AHexTile* start, AHexTile* next, AHexTile
 
 }
 
-void AHexGridManager::setPriorities(int targetHex)
+void AHexGridManager::setPriorities(int targetHex, int range, bool rangeCheck)
 {
 	clearPriorities();
 
@@ -295,11 +341,11 @@ void AHexGridManager::setPriorities(int targetHex)
 	{
 		for (AHexTile* hex : HexGridArray)
 		{
-			if (hex->movePrio == p && hex->moveBlock == false)
+			if (hex->movePrio == p && (hex->moveBlock == false || rangeCheck == true))
 			{
 				for (AHexTile* hex2 : HexGridArray)
 				{
-					if (checkIfAdjacent(hex, hex2))
+					if (checkIfAdjacent(hex, hex2, range))
 					{
 						++checked;
 						if (hex2->movePrio == -1)
@@ -315,7 +361,6 @@ void AHexGridManager::setPriorities(int targetHex)
 
 			}
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Once!"));
 		if (checked == numberOfTiles)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("All checked!"));
