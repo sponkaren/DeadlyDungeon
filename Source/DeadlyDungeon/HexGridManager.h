@@ -77,10 +77,10 @@ public:
 	bool calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range=1);
 	void calculateMoveTowards(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range = 1);
 
-	void movementCalc(TArray<int>& movementArray, int hexIndex, int movementLeft, int& locPrio);
+	void movementCalc(TArray<int>& movementArray, int hexIndex, int movementLeft, int& locPrio, int range=1);
 
 	int getAttractiveness(AHexTile* start, AHexTile* next, AHexTile* end);
-	int getGStar(AHexTile* start, AHexTile* next, AHexTile* end);
+	int getGStar(AHexTile* ref, AHexTile* end);
 
 	void setPriorities(int targetHex, int locHex, int range=1, bool rangeCheck=false);
 	void clearPriorities();

@@ -6,7 +6,8 @@
 
 FPlayerStruct StatGenerator::generateStats(int level)
 {
-	int randomStruct = FMath::RandRange(1, 2);
+	//int randomStruct = FMath::RandRange(1, 2);
+	int randomStruct = 2;
 	FPlayerStruct stats;
 	
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Rand: %i"),
