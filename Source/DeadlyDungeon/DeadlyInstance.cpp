@@ -90,7 +90,7 @@ void UDeadlyInstance::SaveGame()
 void UDeadlyInstance::SaveCharacter(APlayerCharacter* character)
 { 
     SaveGameObject->alivePlayers.Emplace(character->getStats());
-
+    SaveGameObject->lastDungeonUnlock = 3;
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("m_maxHealth: %f"),
         SaveGameObject->alivePlayers[0].maxHealth));
 

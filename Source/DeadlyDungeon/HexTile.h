@@ -64,6 +64,7 @@ public:
 	int m_index{};
 
 	int movePrio{-1};
+	int gStar{};
 
 	bool moveBlock{ false };
 
@@ -72,6 +73,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 	FOnHexClicked HexTileClicked;
+
+	TArray<AHexTile*> adjacentHex;
 
 	void setAxial(int r, int q);
 	int getAxialR();

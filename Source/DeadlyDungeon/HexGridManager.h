@@ -9,6 +9,21 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnThisHexClicked, AHexTile*, hex);
 
+/*
+USTRUCT(BlueprintType)
+struct FHexStruct
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY()
+		uint8 characterClass;
+	UPROPERTY()
+		int initiative;
+	UPROPERTY()
+		int movement;
+};
+*/
+
 UCLASS()
 class DEADLYDUNGEON_API AHexGridManager : public AActor
 {
@@ -36,6 +51,8 @@ public:
 	AHexGridManager();
 
 	TArray<AHexTile*> HexGridArray;
+
+	TArray<int> hexIndexes;
 	
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 
@@ -43,6 +60,8 @@ public:
 
 	UFUNCTION()
 	void whenHexClicked(AHexTile* hex);
+
+	void setAdjacentHex();
 
 	bool checkIfAdjacent(AHexTile* h1, AHexTile* h2, int range=1);
 	void highlightTiles(int hexIndex);
@@ -61,10 +80,13 @@ public:
 	void movementCalc(TArray<int>& movementArray, int hexIndex, int movementLeft, int& locPrio);
 
 	int getAttractiveness(AHexTile* start, AHexTile* next, AHexTile* end);
+	int getGStar(AHexTile* start, AHexTile* next, AHexTile* end);
 
-	void setPriorities(int hexIndex, int range=1, bool rangeCheck=false);
+	void setPriorities(int targetHex, int locHex, int range=1, bool rangeCheck=false);
 	void clearPriorities();
-	int getTargetPriority(int hexIndex, int targetIndex);
+
+	void sortByGStar(int startIndex);
+	void setIndexArray();
 
 
 protected:

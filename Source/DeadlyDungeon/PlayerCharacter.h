@@ -14,18 +14,24 @@ struct FPlayerStruct
 {
 	GENERATED_BODY()
 public:
-	PlayerCharacterClass characterClass;
+	UPROPERTY()
+	uint8 characterClass;
+	UPROPERTY()
 	int initiative;
+	UPROPERTY()
 	int movement;
+	UPROPERTY()
 	float attack;
+	UPROPERTY()
 	int numberOfAttacks;
+	UPROPERTY()
 	float maxHealth;
+	UPROPERTY()
 	int range;
 };
 
-
-UENUM()
-enum class PlayerCharacterClass : uint8
+UENUM(BlueprintType)
+enum class ECharacterClass : uint8
 {
 	OTTO,
 	WARRIOR,
@@ -34,6 +40,7 @@ enum class PlayerCharacterClass : uint8
 	RANGER,
 	MAX UMETA(Hidden)
 };
+
 
 UENUM()
 enum class CharacterType : uint8
@@ -63,8 +70,8 @@ public:
 	e_state m_state{ IDLE };
 
 	//personal
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
-	PlayerCharacterClass m_characterClass;
+	UPROPERTY(BlueprintType)
+	ECharacterClass m_characterClass;
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 	int m_initiative;

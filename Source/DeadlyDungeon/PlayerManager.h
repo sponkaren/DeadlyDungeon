@@ -67,8 +67,6 @@ public:
 	void storeSelectedCharacter(APlayerCharacter*);
 
 	void setSelectedCharacter(APlayerCharacter* character);
-
-	APlayerCharacter* getSelectedCharacer();
 	
 	void startAI();
 

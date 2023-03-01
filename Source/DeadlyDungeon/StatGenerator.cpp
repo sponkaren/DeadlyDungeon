@@ -17,7 +17,7 @@ FPlayerStruct StatGenerator::generateStats(int level)
 	case 1:
 		//warrior
 		stats = {
-			PlayerCharacterClass::WARRIOR,
+			static_cast<uint8>(ECharacterClass::WARRIOR),
 			//int initiative
 			5,
 			//int movement
@@ -35,7 +35,7 @@ FPlayerStruct StatGenerator::generateStats(int level)
 	case 2:
 		//ranger
 		stats = {
-			PlayerCharacterClass::RANGER,
+			static_cast<uint8>(ECharacterClass::RANGER),
 			//int initiative
 			5,
 			//int movement

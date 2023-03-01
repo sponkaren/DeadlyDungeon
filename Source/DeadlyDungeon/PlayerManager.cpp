@@ -40,6 +40,7 @@ void APlayerManager::spawnHexGridManager()
 
 	hexManager = GetWorld()->SpawnActor<AHexGridManager>(bp_hexManager, Location, Rotation);
 	hexManager->thisHexClicked.AddDynamic(this, &APlayerManager::whenHexClicked);
+	hexManager->setAdjacentHex();
 }
 
 void APlayerManager::handlePlayersToSpawn(TArray<FPlayerStruct>& players)
@@ -145,11 +146,6 @@ void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
 	}	
 }
 
-APlayerCharacter* APlayerManager::getSelectedCharacer()
-{
-	return m_selectedCharacter;
-}
-
 void APlayerManager::startAI()
 {
 	int characterHex{m_selectedCharacter->getHexLocation() };
@@ -243,11 +239,11 @@ void APlayerManager::characterClicked(APlayerCharacter* character)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Overkill!"));
 		return;
 	}
-	*/
-	
+	*/	
 
 	if (m_selectedCharacter->getAttacking())
 	{
+
 		if (validateAttack(character->getHexLocation()))
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Attack!"));
@@ -266,7 +262,7 @@ void APlayerManager::characterClicked(APlayerCharacter* character)
 
 void APlayerManager::whenHexClicked(AHexTile* hex)
 {
-	if (!getSelectedCharacer())
+	if (!m_selectedCharacter)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No selected character"));
 	}
@@ -289,7 +285,7 @@ void APlayerManager::removeCharacter(APlayerCharacter& character)
 	character.m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character.m_TPose, true);
 	character.m_playerCharacterMesh->SetSimulatePhysics(true);
 
-	FRotator rotation{ UKismetMathLibrary::FindLookAtRotation(character.m_origin, APlayerManager::getSelectedCharacer()->getLocation()) };
+	FRotator rotation{ UKismetMathLibrary::FindLookAtRotation(character.m_origin, m_selectedCharacter->getLocation()) };
 
 	FVector impulse{ rotation.Vector() * -5000 };
 	character.m_playerCharacterMesh->AddImpulse(impulse, "", true);
@@ -380,7 +376,7 @@ bool APlayerManager::setAttacking(bool ally)
 			m_selectedCharacter->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_selectedCharacter->m_attackAnim, true);
 			m_selectedCharacter->m_state = m_selectedCharacter->ATTACKING;
 			hexManager->highlightsOff();
-			hexManager->highlightAttackTiles(m_selectedCharacter->getHexLocation());
+			hexManager->highlightAttackTiles(m_selectedCharacter->getHexLocation(),m_selectedCharacter->m_range);
 			return true;
 		}
 		return false;	
@@ -450,7 +446,7 @@ void APlayerManager::setIdle(APlayerCharacter* character)
 
 bool APlayerManager::validateMovement(int hexIndex)
 {
-	if (hexManager->checkIfAdjacent(hexManager->HexGridArray[hexIndex], hexManager->HexGridArray[getSelectedCharacer()->getHexLocation()])
+	if (hexManager->checkIfAdjacent(hexManager->HexGridArray[hexIndex], hexManager->HexGridArray[m_selectedCharacter->getHexLocation()])
 		&& m_selectedCharacter->m_type == CharacterType::ALLY)
 	{
 		return true;
@@ -461,8 +457,9 @@ bool APlayerManager::validateMovement(int hexIndex)
 
 bool APlayerManager::validateAttack(int hexIndex)
 {
-	if (hexManager->checkIfAdjacent(hexManager->HexGridArray[hexIndex], hexManager->HexGridArray[getSelectedCharacer()->getHexLocation()]), m_selectedCharacter->m_range)
+	if (hexManager->checkIfAdjacent(hexManager->HexGridArray[hexIndex], hexManager->HexGridArray[m_selectedCharacter->getHexLocation()], m_selectedCharacter->m_range))
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Valid AF!"));
 		return true;
 	}
 	else
