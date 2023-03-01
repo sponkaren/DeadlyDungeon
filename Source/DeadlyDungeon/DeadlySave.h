@@ -21,6 +21,9 @@ public:
 	UDeadlySave();
 	
 	UPROPERTY(VisibleAnywhere, Category = Basic)
+	int characterID{ 1 };
+
+	UPROPERTY(VisibleAnywhere, Category = Basic)
 	TArray<FPlayerStruct> alivePlayers;
 	
 	UPROPERTY(VisibleAnywhere, Category = Basic)

@@ -8,6 +8,8 @@
 #include "HexGridManager.h"
 #include "PlayerManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDeath, int, ID);
+
 UCLASS()
 class DEADLYDUNGEON_API APlayerManager : public AActor
 {
@@ -52,6 +54,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
+	FOnPlayerDeath PlayerDeath;
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void spawnHexGridManager();

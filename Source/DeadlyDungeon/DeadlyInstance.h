@@ -51,4 +51,7 @@ public:
 
 	UFUNCTION()
 	void SaveCharacter(APlayerCharacter* character);
+
+	UFUNCTION()
+	void DeleteCharacter(int ID);
 };

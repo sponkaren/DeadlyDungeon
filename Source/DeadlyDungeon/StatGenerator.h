@@ -5,9 +5,6 @@
 #include "PlayerCharacter.h"
 #include "CoreMinimal.h"
 
-/**
- * 
- */
 class DEADLYDUNGEON_API StatGenerator
 {
 public:
@@ -15,5 +12,5 @@ public:
 	StatGenerator();
 	~StatGenerator();
 
-	static FPlayerStruct generateStats(int level);
+	static FPlayerStruct generateStats(int level, int ID=0);
 };

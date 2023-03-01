@@ -117,13 +117,17 @@ void AHexGridManager::setAdjacentHex()
 	}
 }
 
-void AHexGridManager::highlightTiles(int hexIndex) 
-{
+void AHexGridManager::highlightTiles(int hexIndex, int movement) 
+{	
 	for (AHexTile* hex : HexGridArray[hexIndex]->adjacentHex)
 	{
 		if (!hex->getOccupied())
 		{
 			hex->setHighightVisible(true);
+			if (movement>1)
+			{
+				highlightTiles(hex->m_index, movement-1);
+			}			
 		}
 	}
 }
@@ -260,7 +264,10 @@ bool AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHe
 		return true;
 	}
 
-	movementCalc(movementArray, hexIndex, movementLeft, locPrio,range);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("locPrio: %i"),
+		locPrio));
+
+	movementCalc(movementArray, hexIndex, movementLeft, locPrio, range);
 	clearPriorities();
 	
 	if (locPrio <= range)
@@ -310,11 +317,11 @@ void AHexGridManager::movementCalc(TArray<int>& movementArray, int hexIndex, int
 				if (!traveled)
 				{
 					int destPrio = hex->movePrio;
-					if (destPrio > 0 && destPrio < locPrio)
+					if (destPrio >= 0 && destPrio < locPrio)
 					{
 						locPrio = destPrio;
-						//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Set new locPrio: %i"),
-							//locPrio));
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Set new locPrio: %i"),
+							locPrio));
 						nextIndex = hex->m_index;
 						nextFound = true;
 					}
@@ -354,8 +361,8 @@ void AHexGridManager::movementCalc(TArray<int>& movementArray, int hexIndex, int
 
 		if (nextFound)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Adding index: %i"),
-			//	nextIndex));
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Adding index: %i"),
+				nextIndex));
 			movementArray.Emplace(nextIndex);
 			if (locPrio <= range)
 				return;

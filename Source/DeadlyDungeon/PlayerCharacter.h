@@ -15,6 +15,8 @@ struct FPlayerStruct
 	GENERATED_BODY()
 public:
 	UPROPERTY()
+	int ID;
+	UPROPERTY()
 	uint8 characterClass;
 	UPROPERTY()
 	int initiative;
@@ -70,6 +72,9 @@ public:
 	e_state m_state{ IDLE };
 
 	//personal
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+	int m_ID;
+
 	UPROPERTY(BlueprintType)
 	ECharacterClass m_characterClass;
 

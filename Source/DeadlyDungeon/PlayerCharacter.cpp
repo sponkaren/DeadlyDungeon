@@ -7,8 +7,6 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
 
-//constexpr float baseWait{ 0.5 };
-
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
@@ -32,6 +30,7 @@ void APlayerCharacter::Init(FPlayerStruct& stats)
 
 void APlayerCharacter::setStats(FPlayerStruct& stats)
 {
+	m_ID = stats.ID;
 	m_characterClass = static_cast<ECharacterClass>(stats.characterClass);
 	m_initiative = stats.initiative;
 	m_movement = stats.movement;
@@ -43,8 +42,9 @@ void APlayerCharacter::setStats(FPlayerStruct& stats)
 
 FPlayerStruct APlayerCharacter::getStats()
 {
-	FPlayerStruct playerStruct = { static_cast<uint8>(m_characterClass), m_initiative, m_movement, m_attack, m_numberOfAttacks, m_maxHealth, m_range };
-	
+	FPlayerStruct playerStruct = {m_ID, static_cast<uint8>(m_characterClass), m_initiative, m_movement, m_attack, m_numberOfAttacks, m_maxHealth, m_range };
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("m_ID is: %i"),
+		m_ID));
 	return playerStruct;
 }
 

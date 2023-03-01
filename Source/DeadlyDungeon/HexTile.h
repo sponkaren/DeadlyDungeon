@@ -26,7 +26,7 @@ class DEADLYDUNGEON_API AHexTile : public AActor
 {
 	GENERATED_BODY()
 	
-protected:
+public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
 		UStaticMeshComponent* m_tileMesh {};
@@ -39,8 +39,6 @@ protected:
 		UStaticMeshComponent* m_tileAttackHighlight {};
 
 	USceneComponent* m_rootComponent;
-
-public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
 	EHexTileType m_tileType {};
@@ -63,6 +61,7 @@ public:
 	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
 	int m_index{};
 
+	bool inRange{ false };
 	int movePrio{-1};
 	int gStar{};
 

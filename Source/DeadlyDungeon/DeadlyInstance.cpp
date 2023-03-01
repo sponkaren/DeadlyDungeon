@@ -17,14 +17,12 @@ void UDeadlyInstance::MenuSetup()
     if(menuActor)
     { 
         menuManager = Cast<AMenuManager>(menuActor);
+        menuManager->m_ID = SaveGameObject->characterID;
         menuManager->CharacterCreated.AddDynamic(this, &UDeadlyInstance::SaveCharacter);
         menuManager->getHex();
 
         if (SaveGameObject->alivePlayers.Num() > 0)
         {
-            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("m_maxHealth: %f"), 
-            SaveGameObject->alivePlayers[0].maxHealth));
-
             menuManager->spawnAlivePlayers(SaveGameObject->alivePlayers);
         }
     }
@@ -42,6 +40,7 @@ void UDeadlyInstance::DungeonSetup()
     if (playerActor)
     {
         playerManager = Cast<APlayerManager>(playerActor);
+        playerManager->PlayerDeath.AddDynamic(this, &UDeadlyInstance::DeleteCharacter);
         if (SaveGameObject->alivePlayers.Num() > 0)
         {
             playerManager->handlePlayersToSpawn(SaveGameObject->alivePlayers);
@@ -89,17 +88,28 @@ void UDeadlyInstance::SaveGame()
 
 void UDeadlyInstance::SaveCharacter(APlayerCharacter* character)
 { 
+    int tempID = SaveGameObject->characterID;
+    menuManager->m_ID = ++tempID;
+    SaveGameObject->characterID = tempID;
+
     SaveGameObject->alivePlayers.Emplace(character->getStats());
-    SaveGameObject->lastDungeonUnlock = 3;
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("m_maxHealth: %f"),
-        SaveGameObject->alivePlayers[0].maxHealth));
 
     bool IsSaved = UGameplayStatics::SaveGameToSlot(SaveGameObject, SaveGameSlotName, 0);
 
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("m_maxHealth: %f"),
-        SaveGameObject->alivePlayers[0].maxHealth));
-
     LogIfGameWasSavedOrNot(IsSaved);
+}
+
+void UDeadlyInstance::DeleteCharacter(int ID)
+{
+    for(int i{0};i<SaveGameObject->alivePlayers.Num();++i)
+    {
+        if (SaveGameObject->alivePlayers[i].ID == ID)
+        {
+            SaveGameObject->alivePlayers.RemoveAt(i);
+        }
+    }
+
+    SaveGame();
 }
 
 void UDeadlyInstance::LogIfGameWasSavedOrNot(const bool IsSaved)

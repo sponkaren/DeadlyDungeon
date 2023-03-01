@@ -135,10 +135,10 @@ void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
 	lastClicked = character;
 	character->setArrowOn(true);
 	character->resetMoveAtk();
+	characterMovement.Empty();
 	character->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character->m_selectedAnim, true);
 	APlayerManager::storeSelectedCharacter(character);
-	hexManager->highlightTiles(character->getHexLocation());
-	
+	hexManager->highlightTiles(character->getHexLocation(),m_selectedCharacter->m_movementLeft);	
 	
 	if (character->m_type == CharacterType::ENEMY)
 	{
@@ -149,7 +149,7 @@ void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
 void APlayerManager::startAI()
 {
 	int characterHex{m_selectedCharacter->getHexLocation() };
-	characterMovement.Empty();
+	//characterMovement.Empty();
 	TArray<int> targetLocations;
 
 	for (APlayerCharacter* possibleTarget : CharacterArray)
@@ -271,7 +271,10 @@ void APlayerManager::whenHexClicked(AHexTile* hex)
 	{
 		if (!hex->m_occupied)
 		{
-			movePlayerCharacter(hex->m_index);
+			hexManager->calculateMovement(characterMovement, hex->m_index, m_selectedCharacter->m_hexLocationIndex, 
+											m_selectedCharacter->m_movementLeft, 0);
+			setIdle(m_selectedCharacter);
+			//movePlayerCharacter(hex->m_index);
 		}
 		else if (hex->m_occupied)
 		{
@@ -295,6 +298,12 @@ void APlayerManager::removeCharacter(APlayerCharacter& character)
 	--numberOfCharacters;
 	CharacterArray.RemoveAt(character.getIndex());
 	setIndexes();
+
+	if (character.m_type == CharacterType::ALLY)
+	{
+		PlayerDeath.Broadcast(character.m_ID);
+	}
+
 	checkGameOver();
 }
 
@@ -394,14 +403,15 @@ void APlayerManager::selectedIdle(bool ally)
 
 void APlayerManager::setIdle(APlayerCharacter* character)
 {
+	
+	if (characterMovement.Num() > 0)
+	{
+		moveEnemy(characterMovement[0]);
+		return;
+	}
+
 	if (character->m_type == CharacterType::ENEMY)
 	{
-		if (characterMovement.Num() > 0)
-		{
-			moveEnemy(characterMovement[0]);
-			return;
-		}
-		
 		character->m_state = character->IDLE;
 
 		if (character->AIAttack == true)
@@ -436,7 +446,7 @@ void APlayerManager::setIdle(APlayerCharacter* character)
 	if (character->m_type == CharacterType::ALLY && character->m_movementLeft > 0)
 	{
 		character->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character->m_selectedAnim, true);
-		hexManager->highlightTiles(character->getHexLocation());
+		hexManager->highlightTiles(character->getHexLocation(), character->m_movementLeft);
 	}
 	else
 	{
@@ -446,8 +456,7 @@ void APlayerManager::setIdle(APlayerCharacter* character)
 
 bool APlayerManager::validateMovement(int hexIndex)
 {
-	if (hexManager->checkIfAdjacent(hexManager->HexGridArray[hexIndex], hexManager->HexGridArray[m_selectedCharacter->getHexLocation()])
-		&& m_selectedCharacter->m_type == CharacterType::ALLY)
+	if (hexManager->HexGridArray[hexIndex]->inRange && m_selectedCharacter->m_type == CharacterType::ALLY)
 	{
 		return true;
 	}

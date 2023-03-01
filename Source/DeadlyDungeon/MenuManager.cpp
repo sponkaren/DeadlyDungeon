@@ -84,7 +84,7 @@ void AMenuManager::whenHexClicked(AHexTile* hex)
 		FTransform SpawnTransform(Rotation, Location);
 
 		APlayerCharacter* newPlayer = GetWorld()->SpawnActorDeferred<APlayerCharacter>(playerCharacter, SpawnTransform);
-		FPlayerStruct stats{ StatGenerator::generateStats(1)};
+		FPlayerStruct stats{ StatGenerator::generateStats(1,m_ID)};
 		newPlayer->Init(stats);
 		newPlayer->FinishSpawning(SpawnTransform);
 

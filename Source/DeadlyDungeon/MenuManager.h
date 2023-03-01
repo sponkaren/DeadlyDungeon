@@ -39,6 +39,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 	FOnCharacterCreated CharacterCreated;
 
+	int m_ID;
+
 	void setHexDelegates();
 
 	void spawnAlivePlayers(TArray<FPlayerStruct>& players);

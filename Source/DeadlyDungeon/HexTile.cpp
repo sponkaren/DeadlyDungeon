@@ -74,6 +74,7 @@ void AHexTile::hexClicked()
 void AHexTile::setHighightVisible(bool on)
 {
 	m_tileHighlight->SetVisibility(on, true);
+	inRange = on;
 }
 
 void AHexTile::setAttackHighightVisible(bool on)
