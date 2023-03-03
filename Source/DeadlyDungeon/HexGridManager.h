@@ -67,8 +67,8 @@ public:
 	void highlightTiles(int hexIndex, int movement);
 	void highlightAttackTiles(int hexIndex, int range=1);
 	void highlightsOff();
-	int getNextPlayerSpawn();
-	int getNextEnemySpawn();
+	int getNextPlayerSpawn(int players);
+	int getNextEnemySpawn(int enemies);
 	AHexTile* findHexByAxial(int Q, int R);
 
 	int findClosestTarget(int hexIndex, const TArray<int>& targets, int range=1);

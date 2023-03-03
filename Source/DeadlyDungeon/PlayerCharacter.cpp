@@ -14,6 +14,7 @@ APlayerCharacter::APlayerCharacter()
 	m_rootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	m_playerCharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	m_arrowMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArrowMesh"));
+	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandle"));
 	m_playerCharacterMesh->SetupAttachment(m_rootComponent);
 	m_arrowMesh->SetupAttachment(m_rootComponent);
 }
@@ -254,6 +255,67 @@ bool APlayerCharacter::updateHealth(bool damage, float delta)
 float APlayerCharacter::getCurrentHealthPercent()
 {
 	return m_currentHealth/m_maxHealth;
+}
+
+int APlayerCharacter::getCurrentHealth()
+{
+	return m_currentHealth;
+}
+
+void APlayerCharacter::shootCorpse(const FRotator& direction)
+{
+	//UPhysicsHandleComponent* handler = GetWorld()->SpawnActor<UPhysicsHandleComponent>(m_physicsHandler, GetActorLocation(), GetActorRotation());
+	
+	FName SpineBone = "Spine01";
+	FVector BoneLocation = m_playerCharacterMesh->GetBoneLocation(SpineBone, EBoneSpaces::WorldSpace);
+	
+	if (BoneLocation != FVector(0, 0, 0))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Bone location set!"));
+	}
+
+	ACharacterProjectile* projectile = GetWorld()->SpawnActor<ACharacterProjectile>(m_characterProjectile, BoneLocation, GetActorRotation());
+
+	if (projectile)
+	{
+		projectile->ProjectileOverlap.AddDynamic(this, &APlayerCharacter::corpseHit);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Projectile activated!"));
+	}
+
+	//PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+
+	if (PhysicsHandle == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Handler not found!"));
+	}
+
+	if (PhysicsHandle)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Handler activated!"));
+		PhysicsHandle->GrabComponentAtLocation(m_playerCharacterMesh, SpineBone, BoneLocation);
+		projectile->shoot(direction, PhysicsHandle);
+	}
+
+}
+
+void APlayerCharacter::corpseHit(ACharacterProjectile* projectile)
+{
+	if (PhysicsHandle)
+	{
+		PhysicsHandle->ReleaseComponent();	
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Handler deactivate!"));
+	}
+}
+
+void APlayerCharacter::gotShot()
+{
+	if (m_currentHealth > 0)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Shot character ID: %i"),
+			m_hexLocationIndex));
+
+		CharShot.Broadcast(this);
+	}
 }
 
 bool APlayerCharacter::operator<(const APlayerCharacter& Other) const

@@ -167,39 +167,52 @@ AHexTile* AHexGridManager::findHexByAxial(int Q, int R)
 	return nullptr;
 }
 
-int AHexGridManager::getNextPlayerSpawn()
+int AHexGridManager::getNextPlayerSpawn(int players)
 {
-	for(int i{(m_gridWidth/4)*m_gridHeight};i<HexGridArray.Num();i+=m_gridHeight)
+	for(int i{(m_gridWidth/players)*m_gridHeight};i<HexGridArray.Num();i+=m_gridHeight)
 	{
 		if (!HexGridArray[i]->getOccupied())
 		{
 			HexGridArray[i]->setOccupied(true);
 			return i;
+		}
+	}
+	for (AHexTile* hex : HexGridArray)
+	{
+		if (!hex->m_occupied)
+		{
+			hex->setOccupied(true);
+			return hex->m_index;
 		}
 	}
 	return 999;
 }
 
-int AHexGridManager::getNextEnemySpawn()
+int AHexGridManager::getNextEnemySpawn(int enemies)
 {
-	for (int i{ ((m_gridWidth / 4) * m_gridHeight)-1}; i < HexGridArray.Num(); i += m_gridHeight)
+	for (int r{ 1 }; r < 3; ++r)
 	{
-		if (!HexGridArray[i]->getOccupied())
+		for (int i{ ((m_gridWidth / enemies) * m_gridHeight) - r }; i < HexGridArray.Num(); i += m_gridHeight)
 		{
-			HexGridArray[i]->setOccupied(true);
-			return i;
+			if (!HexGridArray[i]->getOccupied())
+			{
+				HexGridArray[i]->setOccupied(true);
+				return i;
+			}
 		}
 	}
-	for (int i{ m_gridHeight - 2 }; i < HexGridArray.Num(); i += m_gridHeight)
+
+	for (AHexTile* hex : HexGridArray)
 	{
-		if (!HexGridArray[i]->getOccupied())
+		if (!hex->m_occupied)
 		{
-			HexGridArray[i]->setOccupied(true);
-			return i;
+			hex->setOccupied(true);
+			return hex->m_index;
 		}
 	}
 	return 999;
 }
+
 
 int AHexGridManager::findClosestTarget(int hexIndex, const TArray<int>& targets, int range)
 {
@@ -224,8 +237,8 @@ int AHexGridManager::findClosestTarget(int hexIndex, const TArray<int>& targets,
 		else if (prio > 0 && prio < lowestValidPrio)
 		{
 			lowestValidPrio = prio;
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Set lowest prio: %i"),
-				lowestValidPrio));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Set lowest prio: %i"),
+			//	lowestValidPrio));
 			targetIndex = HexGridArray[possibleTarget]->m_index;
 		}
 	}

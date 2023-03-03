@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "CharacterProjectile.h"
 #include "PlayerCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharClicked, APlayerCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharIdle, APlayerCharacter*, character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharShot, APlayerCharacter*, character);
 
 USTRUCT(BlueprintType)
 struct FPlayerStruct
@@ -120,6 +123,12 @@ public:
 	USkeletalMeshComponent* m_playerCharacterMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
+	UPhysicsHandleComponent* PhysicsHandle;
+
+	UPROPERTY(EditAnywhere, Category = "Player")
+	TSubclassOf<ACharacterProjectile> m_characterProjectile;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 	UStaticMeshComponent* m_arrowMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")	
@@ -158,7 +167,7 @@ public:
 	float m_lerpDuration{ baseWait };
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-		float m_waitTime{ baseWait };
+	float m_waitTime{ baseWait };
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float m_waitTime2{ baseWait };
@@ -181,6 +190,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 	FOnCharIdle CharIdle;
+
+	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
+	FOnCharShot CharShot;
 
 	void setIndex(int index);
 	int getIndex();
@@ -209,13 +221,24 @@ public:
 	bool updateHealth(bool damage, float delta);
 	bool isPlayer();
 
+	void shootCorpse(const FRotator& direction);
+
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	float getCurrentHealthPercent();
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	int getCurrentHealth();
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	void gotShot();
 
 	FORCEINLINE bool operator<(const APlayerCharacter& Other) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void characterClicked();
+
+	UFUNCTION()
+	void corpseHit(ACharacterProjectile* projectile);
 
 	APlayerCharacter& getCharacter();
 };

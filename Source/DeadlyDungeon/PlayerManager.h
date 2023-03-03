@@ -84,7 +84,7 @@ public:
 	UFUNCTION()
 	void characterClicked(APlayerCharacter* character);
 
-	void removeCharacter(APlayerCharacter& character);
+	void removeCharacter(APlayerCharacter& character, bool shot=false);
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void sortByInitiative();
@@ -106,6 +106,9 @@ public:
 
 	UFUNCTION()
 	void setIdle(APlayerCharacter* character);
+
+	UFUNCTION()
+	void characterShot(APlayerCharacter* character);
 
 	UFUNCTION()
 	void whenHexClicked(AHexTile* hex);

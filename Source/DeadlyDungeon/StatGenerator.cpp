@@ -27,7 +27,7 @@ FPlayerStruct StatGenerator::generateStats(int level, int ID)
 			//int movement
 			3,
 			//float attack
-			10,
+			20,
 			//int numberOfAttacks
 			1,
 			//float maxHealth
@@ -47,7 +47,7 @@ FPlayerStruct StatGenerator::generateStats(int level, int ID)
 			//int movement
 			3,
 			//float attack
-			6,
+			15,
 			//int numberOfAttacks
 			1,
 			//float maxHealth

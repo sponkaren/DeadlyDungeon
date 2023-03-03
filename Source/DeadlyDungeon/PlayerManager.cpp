@@ -48,7 +48,7 @@ void APlayerManager::handlePlayersToSpawn(TArray<FPlayerStruct>& players)
 	
 	for (FPlayerStruct stats : players)
 	{
-		spawnPlayer(stats, hexManager->getNextPlayerSpawn(), false);
+		spawnPlayer(stats, hexManager->getNextPlayerSpawn(players.Num()), false);
 	}
 	
 }
@@ -58,7 +58,7 @@ void APlayerManager::spawnEnemies(int difficulty, int numberOfEnemies)
 	for (int i{ 0 }; i < numberOfEnemies; ++i)
 	{
 		FPlayerStruct stats{ StatGenerator::generateStats(difficulty) };
-		spawnPlayer(stats, hexManager->getNextEnemySpawn(), true);
+		spawnPlayer(stats, hexManager->getNextEnemySpawn(numberOfEnemies), true);
 	}
 }
 
@@ -115,6 +115,7 @@ void APlayerManager::spawnPlayer(FPlayerStruct& stats, int hexIndex, bool enemy)
 
 	newPlayer->CharClicked.AddDynamic(this, &APlayerManager::characterClicked);
 	newPlayer->CharIdle.AddDynamic(this, &APlayerManager::setIdle);
+	newPlayer->CharShot.AddDynamic(this, &APlayerManager::characterShot);
 }
 
 void APlayerManager::storeSelectedCharacter(APlayerCharacter* selectedCharacter)
@@ -169,8 +170,8 @@ void APlayerManager::startAI()
 	int targetHex = hexManager->findClosestTarget(characterHex, targetLocations, m_selectedCharacter->m_range);
 	
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
-		targetHex));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
+	//	targetHex));
 
 	if (targetHex >= 0) 
 	{
@@ -182,14 +183,14 @@ void APlayerManager::startAI()
 	{
 		targetHex = hexManager->findClosestRangeTarget(characterHex, targetLocations, m_selectedCharacter->m_range);
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
-			targetHex));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
+		//	targetHex));
 
 		hexManager->calculateMoveTowards(characterMovement, targetHex, characterHex, m_selectedCharacter->m_movementLeft, m_selectedCharacter->m_range);
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Number of moves(pm): %i"),
-		characterMovement.Num()));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Number of moves(pm): %i"),
+	//	characterMovement.Num()));
 
 	setIdle(m_selectedCharacter);
 }
@@ -246,7 +247,7 @@ void APlayerManager::characterClicked(APlayerCharacter* character)
 
 		if (validateAttack(character->getHexLocation()))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Attack!"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Attack!"));
 			m_selectedCharacter->rotateTo(character->getLocation());
 			if (character->updateHealth(true, m_selectedCharacter->getAttack()))
 			{
@@ -283,15 +284,18 @@ void APlayerManager::whenHexClicked(AHexTile* hex)
 	}
 }
 
-void APlayerManager::removeCharacter(APlayerCharacter& character)
+void APlayerManager::removeCharacter(APlayerCharacter& character, bool shot)
 {
 	character.m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character.m_TPose, true);
 	character.m_playerCharacterMesh->SetSimulatePhysics(true);
 
+	
 	FRotator rotation{ UKismetMathLibrary::FindLookAtRotation(character.m_origin, m_selectedCharacter->getLocation()) };
+	character.shootCorpse(rotation);
+	
 
-	FVector impulse{ rotation.Vector() * -5000 };
-	character.m_playerCharacterMesh->AddImpulse(impulse, "", true);
+	//FVector impulse{ rotation.Vector() * -5000 };
+	//character.m_playerCharacterMesh->AddImpulse(impulse, "", true);
 	hexManager->HexGridArray[character.m_hexLocationIndex]->setAttackHighightVisible(false);
 	hexManager->HexGridArray[character.m_hexLocationIndex]->setOccupied(false);
 
@@ -428,10 +432,6 @@ void APlayerManager::setIdle(APlayerCharacter* character)
 					}
 				}
 			}
-			else
-			{
-				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Can't set attacking!"));
-			}
 		}
 		else if (character->AIAttack == false)
 		{
@@ -468,9 +468,16 @@ bool APlayerManager::validateAttack(int hexIndex)
 {
 	if (hexManager->checkIfAdjacent(hexManager->HexGridArray[hexIndex], hexManager->HexGridArray[m_selectedCharacter->getHexLocation()], m_selectedCharacter->m_range))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Valid AF!"));
 		return true;
 	}
 	else
 		return false;
+}
+
+void APlayerManager::characterShot(APlayerCharacter* character)
+{
+	if (character->updateHealth(true, 50))
+	{
+		removeCharacter(*character);
+	}
 }
