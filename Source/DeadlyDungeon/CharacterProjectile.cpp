@@ -68,7 +68,7 @@ bool ACharacterProjectile::hitSomeone(int health)
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("We continue!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("We continue!"));
 		return false;
 	}
 }
