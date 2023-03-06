@@ -277,20 +277,20 @@ bool AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHe
 		return true;
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("locPrio: %i"),
-		locPrio));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("locPrio: %i"),
+	//	locPrio));
 
 	movementCalc(movementArray, hexIndex, movementLeft, locPrio, range);
 	clearPriorities();
 	
 	if (locPrio <= range)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Returning true!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Returning true!"));
 		return true;
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Returning false!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Returning false!"));
 		return false;
 	}
 }
@@ -333,8 +333,8 @@ void AHexGridManager::movementCalc(TArray<int>& movementArray, int hexIndex, int
 					if (destPrio >= 0 && destPrio < locPrio)
 					{
 						locPrio = destPrio;
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Set new locPrio: %i"),
-							locPrio));
+						//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Set new locPrio: %i"),
+						//	locPrio));
 						nextIndex = hex->m_index;
 						nextFound = true;
 					}
@@ -374,8 +374,8 @@ void AHexGridManager::movementCalc(TArray<int>& movementArray, int hexIndex, int
 
 		if (nextFound)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Adding index: %i"),
-				nextIndex));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Adding index: %i"),
+			//	nextIndex));
 			movementArray.Emplace(nextIndex);
 			if (locPrio <= range)
 				return;
@@ -546,6 +546,6 @@ void AHexGridManager::setIndexArray()
 	{
 		hexIndexes.Emplace(hex->m_index);
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Number of items in hexIndexes: %i"),
-	hexIndexes.Num()));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Number of items in hexIndexes: %i"),
+	//hexIndexes.Num()));
 }

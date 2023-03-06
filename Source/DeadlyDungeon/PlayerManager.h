@@ -35,6 +35,18 @@ protected:
 	TSubclassOf<APlayerCharacter> m_enemyCharacter;
 
 	UPROPERTY(EditAnywhere, Category = "Player Management")
+	TSubclassOf<APlayerCharacter> m_playerWarrior;
+
+	UPROPERTY(EditAnywhere, Category = "Player Management")
+	TSubclassOf<APlayerCharacter> m_playerRanger;
+
+	UPROPERTY(EditAnywhere, Category = "Player Management")
+	TSubclassOf<APlayerCharacter> m_enemyWarrior;
+
+	UPROPERTY(EditAnywhere, Category = "Player Management")
+	TSubclassOf<APlayerCharacter> m_enemyRanger;
+
+	UPROPERTY(EditAnywhere, Category = "Player Management")
 	TSubclassOf<AHexGridManager> bp_hexManager;
 
 	AHexGridManager* hexManager;

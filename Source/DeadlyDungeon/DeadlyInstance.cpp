@@ -44,7 +44,7 @@ void UDeadlyInstance::DungeonSetup()
         if (SaveGameObject->alivePlayers.Num() > 0)
         {
             playerManager->handlePlayersToSpawn(SaveGameObject->alivePlayers);
-            playerManager->spawnEnemies(1,8);
+            playerManager->spawnEnemies(1,5);
         }
     }
 }

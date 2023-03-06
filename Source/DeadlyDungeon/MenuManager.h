@@ -30,6 +30,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Player Management")
 	TSubclassOf<APlayerCharacter> playerCharacter;
 
+	UPROPERTY(EditAnywhere, Category = "Player Management")
+	TSubclassOf<APlayerCharacter> playerWarrior;
+
+	UPROPERTY(EditAnywhere, Category = "Player Management")
+	TSubclassOf<APlayerCharacter> playerRanger;
+
 	FRotator Rotation;
 
 public:	
