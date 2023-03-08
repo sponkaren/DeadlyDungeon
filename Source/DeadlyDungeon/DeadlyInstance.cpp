@@ -46,6 +46,8 @@ void UDeadlyInstance::DungeonSetup()
             playerManager->handlePlayersToSpawn(SaveGameObject->alivePlayers);
             playerManager->spawnEnemies(1,5);
         }
+        spawnTurnActionWidget();
+        playerManager->turnActionWidgetSetup(turnActionWidget);
     }
 }
 
@@ -121,5 +123,19 @@ void UDeadlyInstance::LogIfGameWasSavedOrNot(const bool IsSaved)
     else
     {
         GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Cannot save the game."));
+    }
+}
+
+void UDeadlyInstance::spawnTurnActionWidget()
+{
+    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Spawning that shit"));
+
+    if (turnActionWidgetClass)
+    {
+        if (!turnActionWidget)
+        {
+            turnActionWidget = CreateWidget<UTurnActionWidget>(this, turnActionWidgetClass);
+            turnActionWidget->AddToViewport();
+        }
     }
 }

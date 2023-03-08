@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "PlayerCharacter.h"
 #include "HexGridManager.h"
+#include "TurnActionWidget.h"
 #include "PlayerManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDeath, int, ID);
@@ -51,6 +52,8 @@ protected:
 
 	AHexGridManager* hexManager;
 
+	UTurnActionWidget* turnActionWidget;
+
 	TArray<APlayerCharacter*> CharacterArray;
 
 	APlayerCharacter* m_selectedCharacter;
@@ -74,6 +77,9 @@ public:
 	void spawnHexGridManager();
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	void turnActionWidgetSetup(UTurnActionWidget* widget);
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void handlePlayersToSpawn(TArray<FPlayerStruct>& players);
 
 	void spawnEnemies(int difficulty, int numberOfEnemies);
@@ -95,6 +101,8 @@ public:
 
 	UFUNCTION()
 	void characterClicked(APlayerCharacter* character);
+
+	void characterAttacked(APlayerCharacter* character);
 
 	void removeCharacter(APlayerCharacter& character, bool shot=false);
 
@@ -124,6 +132,9 @@ public:
 
 	UFUNCTION()
 	void whenHexClicked(AHexTile* hex);
+
+	UFUNCTION()
+	void executeClicked(bool active);
 
 	bool validateMovement(int hexIndex);
 

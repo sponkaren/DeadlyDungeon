@@ -146,6 +146,14 @@ void AHexGridManager::highlightAttackTiles(int hexIndex, int range)
 	}
 }
 
+void AHexGridManager::highlightMovement(const TArray<int>& movementArray, bool on)
+{
+	for (int hexIndex : movementArray)
+	{
+		HexGridArray[hexIndex]->setMoveSelectVisible(on);
+	}
+}
+
 void AHexGridManager::highlightsOff()
 {
 	for (AHexTile* hex : HexGridArray)
@@ -214,7 +222,7 @@ int AHexGridManager::getNextEnemySpawn(int enemies)
 }
 
 
-int AHexGridManager::findClosestTarget(int hexIndex, const TArray<int>& targets, int range)
+int AHexGridManager::findClosestTarget(int hexIndex, const TArray<int>& targets, int range, bool highlighting, int movementLeft)
 {
 	int targetIndex{-1};
 	int lowestValidPrio{999};
@@ -227,14 +235,24 @@ int AHexGridManager::findClosestTarget(int hexIndex, const TArray<int>& targets,
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Prio: %i"),
 			prio));
+		
+		if (highlighting)
+		{	
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Checking!"));
+
+			if (prio <= movementLeft+range && prio != 0)
+			{
+				HexGridArray[possibleTarget]->setAttackHighightVisible(true);
+			}
+		}
 
 		//target is self
-		if (prio == 0)
+		if (prio == 0 && highlighting == false)
 		{
 			return HexGridArray[hexIndex]->movePrio;
 		}
 
-		else if (prio > 0 && prio < lowestValidPrio)
+		else if (prio > 0 && prio < lowestValidPrio && highlighting==false)
 		{
 			lowestValidPrio = prio;
 			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Set lowest prio: %i"),

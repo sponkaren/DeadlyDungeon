@@ -7,6 +7,7 @@
 #include "MenuManager.h"
 #include "PlayerManager.h"
 #include "DeadlySave.h"
+#include "TurnActionWidget.h"
 #include "DeadlyInstance.generated.h"
 
 /**
@@ -54,4 +55,13 @@ public:
 
 	UFUNCTION()
 	void DeleteCharacter(int ID);
+
+	UFUNCTION()
+	void spawnTurnActionWidget();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player, HUD and UI")
+	TSubclassOf<class UTurnActionWidget> turnActionWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player, HUD and UI")
+	class UTurnActionWidget* turnActionWidget;
 };

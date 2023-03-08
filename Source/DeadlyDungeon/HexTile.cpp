@@ -9,9 +9,13 @@ AHexTile::AHexTile()
 	m_tileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
 	m_tileHighlight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileHighlight"));
 	m_tileAttackHighlight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileAttackHighlight"));
+	m_tileSelectHighlight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileSelectHighlight"));
+	m_tileAttackSelectHighlight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileAttackSelectHighlight"));
 	m_tileMesh->SetupAttachment(m_rootComponent);
 	m_tileHighlight->SetupAttachment(m_rootComponent);
 	m_tileAttackHighlight->SetupAttachment(m_rootComponent);
+	m_tileSelectHighlight->SetupAttachment(m_rootComponent);
+	m_tileAttackSelectHighlight->SetupAttachment(m_rootComponent);
 	m_location = FVector(0, 0, 0);
 	m_occupied = false;
 }
@@ -80,6 +84,16 @@ void AHexTile::setHighightVisible(bool on)
 void AHexTile::setAttackHighightVisible(bool on)
 {
 	m_tileAttackHighlight->SetVisibility(on, true);
+}
+
+void AHexTile::setMoveSelectVisible(bool on)
+{
+	m_tileSelectHighlight->SetVisibility(on, true);
+}
+
+void AHexTile::setAttackSelectHighightVisible(bool on)
+{
+	m_tileAttackSelectHighlight->SetVisibility(on, true);
 }
 
 int AHexTile::getDistance(const AHexTile& refHex)

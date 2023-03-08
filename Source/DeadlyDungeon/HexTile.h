@@ -38,6 +38,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
 		UStaticMeshComponent* m_tileAttackHighlight {};
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
+		UStaticMeshComponent* m_tileSelectHighlight {};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
+		UStaticMeshComponent* m_tileAttackSelectHighlight {};
+
 	USceneComponent* m_rootComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
@@ -95,6 +101,10 @@ public:
 	void setHighightVisible(bool on);
 
 	void setAttackHighightVisible(bool on);
+
+	void setMoveSelectVisible(bool on);
+	
+	void setAttackSelectHighightVisible(bool on);
 
 	int getDistance(const AHexTile& refHex);
 

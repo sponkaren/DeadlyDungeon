@@ -66,12 +66,13 @@ public:
 	bool checkIfAdjacent(AHexTile* h1, AHexTile* h2, int range=1);
 	void highlightTiles(int hexIndex, int movement);
 	void highlightAttackTiles(int hexIndex, int range=1);
+	void highlightMovement(const TArray<int>& movementArray, bool on=true);
 	void highlightsOff();
 	int getNextPlayerSpawn(int players);
 	int getNextEnemySpawn(int enemies);
 	AHexTile* findHexByAxial(int Q, int R);
 
-	int findClosestTarget(int hexIndex, const TArray<int>& targets, int range=1);
+	int findClosestTarget(int hexIndex, const TArray<int>& targets, int range=1, bool highlighting=false, int movementLeft=0);
 	int findClosestRangeTarget(int hexIndex, const TArray<int>& targets, int range = 1);
 
 	bool calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range=1);

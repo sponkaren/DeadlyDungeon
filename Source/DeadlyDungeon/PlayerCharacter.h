@@ -158,6 +158,18 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	UAnimationAsset* m_TPose;
 
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* allyRangerMat;
+
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* allyWarriorMat;
+
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* enemyRangerMat;
+
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* enemyWarriorMat;
+
 	FVector m_origin;
 	FVector m_destination;
 	
@@ -184,6 +196,7 @@ public:
 
 	void setStats(FPlayerStruct& stats);
 	FPlayerStruct getStats();
+	void setMaterial();
 
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 	FOnCharClicked CharClicked;

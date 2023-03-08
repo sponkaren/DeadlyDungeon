@@ -25,6 +25,7 @@ void APlayerCharacter::Init(FPlayerStruct& stats)
 	PrimaryActorTick.bCanEverTick = true;
 
 	setStats(stats);
+	setMaterial();
 	resetMoveAtk();
 	resetHealth();	
 }
@@ -49,6 +50,39 @@ FPlayerStruct APlayerCharacter::getStats()
 	return playerStruct;
 }
 
+void APlayerCharacter::setMaterial()
+{
+	//m_Material = MaterialManager::getMaterial(static_cast<int>(m_characterClass), isEnemy());
+
+	if (isEnemy())
+	{
+		switch (m_characterClass)
+		{
+		case(ECharacterClass::WARRIOR):
+			if (enemyWarriorMat)
+				m_playerCharacterMesh->SetMaterial(0, enemyWarriorMat);
+			break;
+		case(ECharacterClass::RANGER):
+			if(enemyRangerMat)
+				m_playerCharacterMesh->SetMaterial(0, enemyRangerMat);
+			break;
+		}
+	}
+	else
+	{
+		switch (m_characterClass)
+		{
+		case(ECharacterClass::WARRIOR):
+			if (allyWarriorMat)
+				m_playerCharacterMesh->SetMaterial(0, allyWarriorMat);
+			break;
+		case(ECharacterClass::RANGER):
+			if (allyRangerMat)
+				m_playerCharacterMesh->SetMaterial(0, allyRangerMat);
+			break;
+		}
+	}
+}
 
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
