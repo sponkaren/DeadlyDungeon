@@ -120,7 +120,7 @@ void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
 	if (IsValid(lastClicked))
 	{
 		lastClicked->setMovementLeft(0);
-		setIdle(lastClicked);
+		//setIdle(lastClicked);
 		lastClicked->setArrowOn(false);
 		hexManager->highlightsOff();
 	}
@@ -137,21 +137,10 @@ void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
 	{
 		startAI();
 	}
-
-	setIdle(m_selectedCharacter);
-	/*
-	else if (character->m_type == CharacterType::ALLY)
+	else
 	{
-		TArray<int> targetLocations;
-
-		for (APlayerCharacter* possibleTarget : CharacterArray)
-		{
-			targetLocations.Emplace(possibleTarget->getHexLocation());
-		}
-
-		hexManager->findClosestTarget(m_selectedCharacter->getHexLocation(), targetLocations, m_selectedCharacter->m_range, true, m_selectedCharacter->m_movementLeft);
+		setIdle(m_selectedCharacter);
 	}
-	*/
 }
 
 void APlayerManager::startAI()
@@ -240,39 +229,34 @@ void APlayerManager::occupiedHexClicked(int hexIndex)
 
 void APlayerManager::characterClicked(APlayerCharacter* character)
 {	
-	if (validateAttack(character->getHexLocation()))
+	if (character == m_selectedCharacter)
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Attack!"));
-		m_selectedCharacter->rotateTo(character->getLocation());
-		if (character->updateHealth(true, m_selectedCharacter->getAttack()))
-		{
-			removeCharacter(*character);
-		}
-		if (--m_selectedCharacter->m_numberOfAttacksLeft <= 0)
-		{
-			setIdle(m_selectedCharacter);
-		}
+		resetCommands();
+		return;
 	}
+	if (hexManager->HexGridArray[character->m_hexLocationIndex]->atkHighlight == true)
+	{	
+		int movements{ characterMovement.Num() };
+		bool chainable{ false };
 
-	/*
-	if (m_selectedCharacter->getAttacking())
-	{
-
-		if (validateAttack(character->getHexLocation()))
+		if (movements > 0)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Attack!"));
-			m_selectedCharacter->rotateTo(character->getLocation());
-			if (character->updateHealth(true, m_selectedCharacter->getAttack()))
-			{
-				removeCharacter(*character);
-			}
-			if (--m_selectedCharacter->m_numberOfAttacksLeft <= 0)
-			{
-				setIdle(m_selectedCharacter);				
-			}
+			m_selectedCharacter->AIAttack = hexManager->calculateMovement(characterMovement, character->getHexLocation(), characterMovement[movements - 1],
+				m_selectedCharacter->m_movementLeft - movements, m_selectedCharacter->m_range);
+			if(m_selectedCharacter->AIAttack)
+				chainable = true;
 		}
+		if (!chainable)
+		{
+			resetCommands();
+			m_selectedCharacter->AIAttack = hexManager->calculateMovement(characterMovement, character->getHexLocation(), m_selectedCharacter->getHexLocation(), m_selectedCharacter->m_movementLeft, m_selectedCharacter->m_range, true);
+		}
+		
+		m_selectedCharacter->AITarget = character->getHexLocation();
+		hexManager->HexGridArray[m_selectedCharacter->AITarget]->setAttackSelectHighightVisible(true);
 	}
-	*/
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Out of range!"));
 }
 
 void APlayerManager::characterAttacked(APlayerCharacter* character)
@@ -298,27 +282,45 @@ void APlayerManager::whenHexClicked(AHexTile* hex)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No selected character"));
 	}
-
+	else if (m_selectedCharacter->getHexLocation() == hex->m_index)
+	{
+		resetCommands();
+		return;
+	}
 	else if (validateMovement(hex->m_index))
 	{
 		if (!hex->m_occupied)
 		{
-			if (characterMovement.Num() > 0)
+			int movements{characterMovement.Num()};
+			bool chainable{ false };
+
+			if (movements > 0)
 			{
-				hexManager->highlightMovement(characterMovement, false);
-				characterMovement.Empty();
+				if (hexManager->calculateMovement(characterMovement, hex->m_index, characterMovement[movements - 1],
+					m_selectedCharacter->m_movementLeft-movements, 0))				
+					chainable = true;							
 			}
-			
-			hexManager->calculateMovement(characterMovement, hex->m_index, m_selectedCharacter->m_hexLocationIndex, 
-											m_selectedCharacter->m_movementLeft, 0);
-			
+
+			if (!chainable)
+			{
+				resetCommands();
+				hexManager->calculateMovement(characterMovement, hex->m_index, m_selectedCharacter->m_hexLocationIndex, m_selectedCharacter->m_movementLeft, 0);				
+			}
+
 			hexManager->highlightMovement(characterMovement);
-			
-			//setIdle(m_selectedCharacter);
 		}
 		else if (hex->m_occupied)
 		{
 			occupiedHexClicked(hex->m_index);
+		}
+	}
+	
+	else if (hex->atkHighlight == true)
+	{
+		for (APlayerCharacter* possibleTarget : CharacterArray)
+		{
+			if (possibleTarget->getHexLocation() == hex->m_index)
+				characterClicked(possibleTarget);
 		}
 	}
 }
@@ -446,7 +448,7 @@ void APlayerManager::selectedIdle(bool ally)
 
 void APlayerManager::setIdle(APlayerCharacter* character)
 {
-	
+
 	if (characterMovement.Num() > 0)
 	{
 		hexManager->highlightMovement(characterMovement, false);
@@ -454,32 +456,29 @@ void APlayerManager::setIdle(APlayerCharacter* character)
 		return;
 	}
 
-	if (character->m_type == CharacterType::ENEMY)
-	{
-		character->m_state = character->IDLE;
+	character->m_state = character->IDLE;
 
-		if (character->AIAttack == true)
-		{			
-			if (setAttacking())
+	if (character->AIAttack == true)
+	{			
+		if (setAttacking())
+		{
+			for (APlayerCharacter* possibleTarget : CharacterArray)
 			{
-				for (APlayerCharacter* possibleTarget : CharacterArray)
+				if (possibleTarget->getHexLocation() == character->AITarget)
 				{
-					if (possibleTarget->getHexLocation() == character->AITarget)
-					{
-						for (int i{ 0 }; i < character->m_numberOfAttacks; ++i);
-						characterAttacked(possibleTarget);
-						break;
-					}
+					for (int i{ 0 }; i < character->m_numberOfAttacks; ++i);
+					characterAttacked(possibleTarget);
+					break;
 				}
 			}
 		}
-		else if (character->AIAttack == false)
-		{
-			m_selectedCharacter->m_movementLeft = 0;
-		}		
-	}	
-
-
+	}
+	else if (character->m_type == CharacterType::ENEMY && character->AIAttack == false)
+	{
+		m_selectedCharacter->m_movementLeft = 0;
+		character->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character->m_idleAnim, true);	
+	}		
+	
 	hexManager->highlightsOff();
 	character->m_state = character->IDLE;
 
@@ -501,8 +500,10 @@ void APlayerManager::setIdle(APlayerCharacter* character)
 		{
 			targetLocations.Emplace(possibleTarget->getHexLocation());
 		}
-
-		hexManager->findClosestTarget(m_selectedCharacter->getHexLocation(), targetLocations, m_selectedCharacter->m_range, true, m_selectedCharacter->m_movementLeft);
+		if (character->m_numberOfAttacksLeft > 0)
+		{
+			hexManager->findClosestTarget(m_selectedCharacter->getHexLocation(), targetLocations, m_selectedCharacter->m_range, true, m_selectedCharacter->m_movementLeft);
+		}
 	}
 }
 
@@ -540,4 +541,15 @@ void APlayerManager::characterShot(APlayerCharacter* character)
 	{
 		removeCharacter(*character);
 	}
+}
+
+void APlayerManager::resetCommands()
+{
+	if (characterMovement.Num() > 0)
+	{
+		hexManager->highlightMovement(characterMovement, false);
+		characterMovement.Empty();
+	}
+	hexManager->HexGridArray[m_selectedCharacter->AITarget]->setAttackSelectHighightVisible(false);
+	m_selectedCharacter->AIAttack = false;	
 }

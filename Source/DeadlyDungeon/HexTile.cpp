@@ -84,6 +84,7 @@ void AHexTile::setHighightVisible(bool on)
 void AHexTile::setAttackHighightVisible(bool on)
 {
 	m_tileAttackHighlight->SetVisibility(on, true);
+	atkHighlight = on;
 }
 
 void AHexTile::setMoveSelectVisible(bool on)
@@ -93,7 +94,7 @@ void AHexTile::setMoveSelectVisible(bool on)
 
 void AHexTile::setAttackSelectHighightVisible(bool on)
 {
-	m_tileAttackSelectHighlight->SetVisibility(on, true);
+	m_tileAttackSelectHighlight->SetVisibility(on, true);	
 }
 
 int AHexTile::getDistance(const AHexTile& refHex)

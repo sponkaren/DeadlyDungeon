@@ -75,10 +75,10 @@ public:
 	int findClosestTarget(int hexIndex, const TArray<int>& targets, int range=1, bool highlighting=false, int movementLeft=0);
 	int findClosestRangeTarget(int hexIndex, const TArray<int>& targets, int range = 1);
 
-	bool calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range=1);
+	bool calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range=1, bool highlighting=false);
 	void calculateMoveTowards(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range = 1);
 
-	void movementCalc(TArray<int>& movementArray, int hexIndex, int movementLeft, int& locPrio, int range=1);
+	void movementCalc(TArray<int>& movementArray, int hexIndex, int movementLeft, int& locPrio, int range=1, bool highlighting=false);
 
 	int getAttractiveness(AHexTile* start, AHexTile* next, AHexTile* end);
 	int getGStar(AHexTile* ref, AHexTile* end);

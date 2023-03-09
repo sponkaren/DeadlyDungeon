@@ -68,6 +68,8 @@ public:
 	int m_index{};
 
 	bool inRange{ false };
+	bool atkHighlight{ false };
+
 	int movePrio{-1};
 	int gStar{};
 

@@ -140,4 +140,5 @@ public:
 
 	bool validateAttack(int hexIndex);
 
+	void resetCommands();
 };

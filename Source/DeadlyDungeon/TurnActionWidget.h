@@ -38,10 +38,10 @@ public:
 
 	bool executeActive{ true };
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category="Button Commands")
 	void OnExecuteButtonClicked();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Button Commands")
 	void OnNextTurnButtonClicked();
 
 	void NativeConstruct() override;

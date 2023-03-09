@@ -160,6 +160,8 @@ void AHexGridManager::highlightsOff()
 	{
 		hex->setHighightVisible(false);
 		hex->setAttackHighightVisible(false);
+		hex->setMoveSelectVisible(false);
+		hex->setAttackSelectHighightVisible(false);
 	}
 }
 
@@ -233,12 +235,12 @@ int AHexGridManager::findClosestTarget(int hexIndex, const TArray<int>& targets,
 
 		int prio = HexGridArray[hexIndex]->movePrio;
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Prio: %i"),
-			prio));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Prio: %i"),
+		//	prio));
 		
 		if (highlighting)
 		{	
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Checking!"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Checking!"));
 
 			if (prio <= movementLeft+range && prio != 0)
 			{
@@ -282,7 +284,7 @@ int AHexGridManager::findClosestRangeTarget(int hexIndex, const TArray<int>& tar
 	return targetIndex;
 }
 
-bool AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range)
+bool AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range, bool highlighting)
 {
 	setPriorities(targetHex, hexIndex, range);
 
@@ -298,7 +300,7 @@ bool AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHe
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("locPrio: %i"),
 	//	locPrio));
 
-	movementCalc(movementArray, hexIndex, movementLeft, locPrio, range);
+	movementCalc(movementArray, hexIndex, movementLeft, locPrio, range, highlighting);
 	clearPriorities();
 	
 	if (locPrio <= range)
@@ -321,7 +323,7 @@ void AHexGridManager::calculateMoveTowards(TArray<int>& movementArray, int targe
 	movementCalc(movementArray, hexIndex, movementLeft, locPrio, range);
 }
 
-void AHexGridManager::movementCalc(TArray<int>& movementArray, int hexIndex, int movementLeft, int& locPrio, int range)
+void AHexGridManager::movementCalc(TArray<int>& movementArray, int hexIndex, int movementLeft, int& locPrio, int range, bool highlighting)
 {
 	int q{ HexGridArray[hexIndex]->m_axialQ };
 	int r{ HexGridArray[hexIndex]->m_axialR };
@@ -392,9 +394,13 @@ void AHexGridManager::movementCalc(TArray<int>& movementArray, int hexIndex, int
 
 		if (nextFound)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Adding index: %i"),
-			//	nextIndex));
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Adding index: %i"),
+				nextIndex));
 			movementArray.Emplace(nextIndex);
+			if (highlighting)
+			{
+				HexGridArray[nextIndex]->setMoveSelectVisible(true);
+			}
 			if (locPrio <= range)
 				return;
 			q = HexGridArray[nextIndex]->m_axialQ;

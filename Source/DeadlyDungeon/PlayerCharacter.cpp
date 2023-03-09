@@ -21,7 +21,7 @@ APlayerCharacter::APlayerCharacter()
 
 void APlayerCharacter::Init(FPlayerStruct& stats)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Character init()!"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Character init()!"));
 	PrimaryActorTick.bCanEverTick = true;
 
 	setStats(stats);
@@ -93,7 +93,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	if(m_state == MOVING)
 	{
-		
 		if (m_waitTime > 0)
 		{
 			m_waitTime -= DeltaTime;
