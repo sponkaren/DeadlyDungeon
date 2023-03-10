@@ -6,6 +6,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/LatentActionManager.h"
+#include "Components/Image.h"
+
 #include "assert.h"
 #include "HexGridManager.h"
 #include "HexTile.h"
@@ -48,6 +50,16 @@ void APlayerManager::turnActionWidgetSetup(UTurnActionWidget* widget)
 	turnActionWidget = widget;	
 	turnActionWidget->NextTurn.AddDynamic(this, &APlayerManager::setNextTurn);
 	turnActionWidget->Execute.AddDynamic(this, &APlayerManager::executeClicked);
+}
+
+void APlayerManager::turnOrderWidgetSetup(UTurnOrderWidget* widget)
+{
+	turnOrderWidget = widget;
+}
+
+void APlayerManager::addIconTurnOrder(UMaterialInterface* characterIcon)
+{	
+	turnOrderWidget->createUnitIcon(characterIcon);
 }
 
 void APlayerManager::handlePlayersToSpawn(TArray<FPlayerStruct>& players)
@@ -108,6 +120,8 @@ void APlayerManager::spawnPlayer(FPlayerStruct& stats, int hexIndex, bool enemy)
 	newPlayer->CharClicked.AddDynamic(this, &APlayerManager::characterClicked);
 	newPlayer->CharIdle.AddDynamic(this, &APlayerManager::setIdle);
 	newPlayer->CharShot.AddDynamic(this, &APlayerManager::characterShot);
+
+	addIconTurnOrder(newPlayer->iconMaterial);
 }
 
 void APlayerManager::storeSelectedCharacter(APlayerCharacter* selectedCharacter)
@@ -200,7 +214,6 @@ void APlayerManager::moveEnemy(int movement)
 	hexManager->HexGridArray[movement]->setOccupied(true);
 	m_selectedCharacter->setHexLocation(movement);
 }
-
 
 void APlayerManager::movePlayerCharacter(int destIndex)
 {

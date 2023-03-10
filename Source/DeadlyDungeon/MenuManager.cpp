@@ -47,6 +47,8 @@ void AMenuManager::spawnAlivePlayers(TArray<FPlayerStruct>& players)
 	{
 		if(i<foundHex.Num())
 		{
+			hexTile = Cast<AHexTile>(foundHex[i]);
+			hexTile->setOccupied(true);
 			FVector Location = foundHex[i]->GetActorLocation() + FVector(0, 0, 7);			
 			FTransform SpawnTransform(Rotation, Location);
 

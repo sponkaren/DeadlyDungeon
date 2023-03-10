@@ -4,6 +4,7 @@
 #include <cassert>
 #include "Math/UnrealMathUtility.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetRenderingLibrary.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/PrimitiveComponent.h"
 
@@ -15,8 +16,10 @@ APlayerCharacter::APlayerCharacter()
 	m_playerCharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	m_arrowMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArrowMesh"));
 	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandle"));
+	sceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComponent"));
 	m_playerCharacterMesh->SetupAttachment(m_rootComponent);
 	m_arrowMesh->SetupAttachment(m_rootComponent);
+	sceneCaptureComponent->SetupAttachment(m_playerCharacterMesh);
 }
 
 void APlayerCharacter::Init(FPlayerStruct& stats)
@@ -360,6 +363,19 @@ void APlayerCharacter::characterClicked()
 {
 	CharClicked.Broadcast(this);
 }
+
+void APlayerCharacter::createRenderTarget()
+{
+	textureRenderTarget = UKismetRenderingLibrary::CreateRenderTarget2D(GetWorld());
+	if(textureRenderTarget)
+	{
+		sceneCaptureComponent->TextureTarget = textureRenderTarget;
+	}
+
+	//Måndag: Skapa ett material som använder textureRenderTarget. Materialet kan sen hämtas av playermanager
+}
+
+
 
 APlayerCharacter& APlayerCharacter::getCharacter()
 {

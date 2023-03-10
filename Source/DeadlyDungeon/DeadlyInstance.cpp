@@ -43,11 +43,12 @@ void UDeadlyInstance::DungeonSetup()
         playerManager->PlayerDeath.AddDynamic(this, &UDeadlyInstance::DeleteCharacter);
         if (SaveGameObject->alivePlayers.Num() > 0)
         {
+            spawnWidgets();
+            playerManager->turnActionWidgetSetup(turnActionWidget);
+            playerManager->turnOrderWidgetSetup(turnOrderWidget);
             playerManager->handlePlayersToSpawn(SaveGameObject->alivePlayers);
             playerManager->spawnEnemies(1,5);
-        }
-        spawnTurnActionWidget();
-        playerManager->turnActionWidgetSetup(turnActionWidget);
+        }   
     }
 }
 
@@ -126,7 +127,7 @@ void UDeadlyInstance::LogIfGameWasSavedOrNot(const bool IsSaved)
     }
 }
 
-void UDeadlyInstance::spawnTurnActionWidget()
+void UDeadlyInstance::spawnWidgets()
 {
     GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Spawning that shit"));
 
@@ -138,4 +139,14 @@ void UDeadlyInstance::spawnTurnActionWidget()
             turnActionWidget->AddToViewport();
         }
     }
+
+    if (turnOrderWidgetClass)
+    {
+        if (!turnOrderWidget)
+        {
+            turnOrderWidget = CreateWidget<UTurnOrderWidget>(this, turnOrderWidgetClass);
+            turnOrderWidget->AddToViewport();
+        }
+    }
+
 }

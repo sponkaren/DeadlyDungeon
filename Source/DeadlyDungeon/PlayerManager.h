@@ -7,6 +7,7 @@
 #include "PlayerCharacter.h"
 #include "HexGridManager.h"
 #include "TurnActionWidget.h"
+#include "TurnOrderWidget.h"
 #include "PlayerManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDeath, int, ID);
@@ -54,6 +55,14 @@ protected:
 
 	UTurnActionWidget* turnActionWidget;
 
+	UTurnOrderWidget* turnOrderWidget;
+
+	UPROPERTY(EditAnywhere, Category = "Player Management")
+	UMaterialInterface* iconMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Player Management")
+	UTexture2D* iconTexture;
+
 	TArray<APlayerCharacter*> CharacterArray;
 
 	APlayerCharacter* m_selectedCharacter;
@@ -78,6 +87,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void turnActionWidgetSetup(UTurnActionWidget* widget);
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	void turnOrderWidgetSetup(UTurnOrderWidget* widget);
+
+	void addIconTurnOrder(UMaterialInterface* characterIcon);
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void handlePlayersToSpawn(TArray<FPlayerStruct>& players);

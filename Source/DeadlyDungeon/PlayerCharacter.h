@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Engine/TextureRenderTarget2D.h"
 #include "CharacterProjectile.h"
 #include "PlayerCharacter.generated.h"
 
@@ -124,6 +126,18 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 	UPhysicsHandleComponent* PhysicsHandle;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
+	USceneCaptureComponent2D* sceneCaptureComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Player, HUD and UI")
+	UMaterialInterface* iconMaterial;
+
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player, HUD and UI")
+	//TSubclassOf<class UTextureRenderTarget2D> textureRenderTargetClass;
+
+	UPROPERTY(EditAnywhere, Category = "Player, HUD and UI")
+	UTextureRenderTarget2D* textureRenderTarget;
 
 	UPROPERTY(EditAnywhere, Category = "Player")
 	TSubclassOf<ACharacterProjectile> m_characterProjectile;
@@ -252,6 +266,8 @@ public:
 
 	UFUNCTION()
 	void corpseHit(ACharacterProjectile* projectile);
+
+	void createRenderTarget();
 
 	APlayerCharacter& getCharacter();
 };
