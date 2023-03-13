@@ -9,6 +9,7 @@
 #include "Components/Image.h"
 #include "TurnOrderWidget.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHoverChange, int, index, bool, on);
 /**
  * 
  */
@@ -25,11 +26,21 @@ protected:
 	class UVerticalBox* verticalBox;
 
 public:
-	void createUnitIcon(UMaterialInterface* texture);
+	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
+	FOnHoverChange HoverChange;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player, HUD and UI")
 	TSubclassOf<class UUnitIconWidget> iconWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player, HUD and UI")
 	class UUnitIconWidget* iconWidget;
+
+	void createUnitIcon(UMaterialInterface* texture);
+
+	void setActiveTurn(int index);
+
+	UFUNCTION()
+	void iconHovered(UUnitIconWidget* icon, bool on);
+
+	void deleteIcon(int index);
 };

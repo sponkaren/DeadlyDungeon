@@ -131,7 +131,10 @@ public:
 	USceneCaptureComponent2D* sceneCaptureComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Player, HUD and UI")
-	UMaterialInterface* iconMaterial;
+	UMaterialInstanceDynamic* iconMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Player, HUD and UI")
+	UMaterialInterface* iconMaterialBase;
 
 	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player, HUD and UI")
 	//TSubclassOf<class UTextureRenderTarget2D> textureRenderTargetClass;

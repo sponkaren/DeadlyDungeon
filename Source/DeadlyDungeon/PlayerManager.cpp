@@ -55,6 +55,15 @@ void APlayerManager::turnActionWidgetSetup(UTurnActionWidget* widget)
 void APlayerManager::turnOrderWidgetSetup(UTurnOrderWidget* widget)
 {
 	turnOrderWidget = widget;
+	turnOrderWidget->HoverChange.AddDynamic(this, &APlayerManager::hoverChange);
+}
+
+void APlayerManager::setTurnOrderIcons()
+{
+	for (APlayerCharacter* player : CharacterArray)
+	{
+		addIconTurnOrder(player->iconMaterial);
+	}
 }
 
 void APlayerManager::addIconTurnOrder(UMaterialInterface* characterIcon)
@@ -116,12 +125,13 @@ void APlayerManager::spawnPlayer(FPlayerStruct& stats, int hexIndex, bool enemy)
 	newPlayer->setHexLocation(hexIndex);
 	newPlayer->setLocation(Location);
 	newPlayer->setEnemy(enemy);
+	newPlayer->createRenderTarget();
 
 	newPlayer->CharClicked.AddDynamic(this, &APlayerManager::characterClicked);
 	newPlayer->CharIdle.AddDynamic(this, &APlayerManager::setIdle);
 	newPlayer->CharShot.AddDynamic(this, &APlayerManager::characterShot);
 
-	addIconTurnOrder(newPlayer->iconMaterial);
+	//addIconTurnOrder(newPlayer->iconMaterial);
 }
 
 void APlayerManager::storeSelectedCharacter(APlayerCharacter* selectedCharacter)
@@ -354,7 +364,15 @@ void APlayerManager::removeCharacter(APlayerCharacter& character, bool shot)
 	hexManager->HexGridArray[character.m_hexLocationIndex]->setOccupied(false);
 
 	--numberOfCharacters;
-	CharacterArray.RemoveAt(character.getIndex());
+	int deadIndex{ character.getIndex() };
+	turnOrderWidget->deleteIcon(deadIndex);
+	CharacterArray.RemoveAt(deadIndex);
+	
+	if (turnIndex >= deadIndex)
+	{
+		--turnIndex;
+	}
+
 	setIndexes();
 
 	if (character.m_type == CharacterType::ALLY)
@@ -400,7 +418,9 @@ void APlayerManager::sortByInitiative()
 {
 	CharacterArray.Sort();
 	setIndexes();
+	setTurnOrderIcons();
 	setSelectedCharacter(CharacterArray[turnIndex]);
+	turnOrderWidget->setActiveTurn(turnIndex);
 } 
 
 void APlayerManager::setIndexes()
@@ -417,13 +437,15 @@ void APlayerManager::setNextTurn()
 	{
 		if (turnIndex < CharacterArray.Num() - 1)
 		{
-			setSelectedCharacter(CharacterArray[++turnIndex]);
+			turnOrderWidget->setActiveTurn(++turnIndex);
+			setSelectedCharacter(CharacterArray[turnIndex]);
 		}
 		else
 		{
 			turnIndex = 0;
+			turnOrderWidget->setActiveTurn(turnIndex);
 			setSelectedCharacter(CharacterArray[turnIndex]);
-		}
+		}		
 	}
 }
 
@@ -565,4 +587,13 @@ void APlayerManager::resetCommands()
 	}
 	hexManager->HexGridArray[m_selectedCharacter->AITarget]->setAttackSelectHighightVisible(false);
 	m_selectedCharacter->AIAttack = false;	
+}
+
+void APlayerManager::hoverChange(int index, bool on)
+{
+	if (index != m_selectedCharacter->m_index)
+	{
+		CharacterArray[index]->setArrowOn(on);
+	}
+
 }

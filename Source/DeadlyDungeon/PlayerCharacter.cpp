@@ -19,7 +19,7 @@ APlayerCharacter::APlayerCharacter()
 	sceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCaptureComponent"));
 	m_playerCharacterMesh->SetupAttachment(m_rootComponent);
 	m_arrowMesh->SetupAttachment(m_rootComponent);
-	sceneCaptureComponent->SetupAttachment(m_playerCharacterMesh);
+	sceneCaptureComponent->SetupAttachment(m_playerCharacterMesh, "Head");	
 }
 
 void APlayerCharacter::Init(FPlayerStruct& stats)
@@ -366,13 +366,17 @@ void APlayerCharacter::characterClicked()
 
 void APlayerCharacter::createRenderTarget()
 {
+	//Creating render target
 	textureRenderTarget = UKismetRenderingLibrary::CreateRenderTarget2D(GetWorld());
+	
+	//Setting render target of the scene capture component
 	if(textureRenderTarget)
 	{
 		sceneCaptureComponent->TextureTarget = textureRenderTarget;
 	}
 
-	//Måndag: Skapa ett material som använder textureRenderTarget. Materialet kan sen hämtas av playermanager
+	iconMaterial = UMaterialInstanceDynamic::Create(iconMaterialBase, this);
+	iconMaterial->SetTextureParameterValue("TextureParam", textureRenderTarget);
 }
 
 

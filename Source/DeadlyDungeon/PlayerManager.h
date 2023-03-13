@@ -91,6 +91,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void turnOrderWidgetSetup(UTurnOrderWidget* widget);
 
+	void setTurnOrderIcons();
+
 	void addIconTurnOrder(UMaterialInterface* characterIcon);
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
@@ -155,4 +157,7 @@ public:
 	bool validateAttack(int hexIndex);
 
 	void resetCommands();
+
+	UFUNCTION()
+	void hoverChange(int index, bool on);
 };
