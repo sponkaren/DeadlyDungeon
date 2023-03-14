@@ -99,3 +99,16 @@ void AMenuManager::getHex()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHexTile::StaticClass(), foundHex);
 	setHexDelegates();
 }
+
+bool AMenuManager::characterExists()
+{
+	bool exists{ false };
+
+	for (AActor* actor : foundHex)
+	{
+		hexTile = Cast<AHexTile>(actor);
+		if (hexTile->getOccupied() == true)
+			exists = true;
+	}
+	return exists;
+}

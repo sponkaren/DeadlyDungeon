@@ -11,6 +11,7 @@
 #include "PlayerManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDeath, int, ID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameOver, bool, win);
 
 UCLASS()
 class DEADLYDUNGEON_API APlayerManager : public AActor
@@ -81,6 +82,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 	FOnPlayerDeath PlayerDeath;
+
+	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
+	FOnGameOver GameOver;
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void spawnHexGridManager();

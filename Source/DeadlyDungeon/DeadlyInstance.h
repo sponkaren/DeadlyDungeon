@@ -9,6 +9,7 @@
 #include "DeadlySave.h"
 #include "TurnActionWidget.h"
 #include "TurnOrderWidget.h"
+#include "EndScreenWidget.h"
 #include "DeadlyInstance.generated.h"
 
 /**
@@ -71,4 +72,22 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player, HUD and UI")
 	class UTurnOrderWidget* turnOrderWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player, HUD and UI")
+	TSubclassOf<class UEndScreenWidget> endScreenWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player, HUD and UI")
+	class UEndScreenWidget* endScreenWidget;
+
+	UPROPERTY(EditAnywhere)
+	FName LevelToLoad;
+
+	UFUNCTION(BlueprintCallable, Category = "Game Manager")
+	bool characterExists();
+
+	UFUNCTION()
+	void setGameOver(bool win);
+
+	UFUNCTION()
+	void goToMenu();
 };

@@ -103,7 +103,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}		
 		
 
-		if (m_timeElapsed < m_lerpDuration)
+		if (m_timeElapsed <= m_lerpDuration)
 		{
 			SetActorLocation(FMath::Lerp(m_origin, m_destination, m_timeElapsed/m_lerpDuration));	
 			m_timeElapsed += DeltaTime;
@@ -118,6 +118,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 		else
 		{
+			SetActorLocation(m_destination);
 			m_timeElapsed = 0;
 			m_lerpDuration = baseWait;
 			m_waitTime = baseWait;
@@ -255,6 +256,7 @@ void APlayerCharacter::startIdling()
 void APlayerCharacter::setArrowOn(bool on)
 {
 	m_arrowMesh->SetVisibility(on, true);
+	arrowOn = on;
 }
 
 void APlayerCharacter::setMovementLeft(int movement)

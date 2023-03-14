@@ -201,6 +201,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float m_waitTime2{ baseWait };
 
+	UPROPERTY(BlueprintReadWrite, Category = "Player")
+	bool arrowOn{ false };
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

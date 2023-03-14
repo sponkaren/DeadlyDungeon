@@ -57,4 +57,6 @@ public:
 	void whenHexClicked(AHexTile* hex);
 
 	void getHex();
+
+	bool characterExists();
 };

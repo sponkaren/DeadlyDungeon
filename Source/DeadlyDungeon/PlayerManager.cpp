@@ -7,7 +7,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/LatentActionManager.h"
 #include "Components/Image.h"
-
 #include "assert.h"
 #include "HexGridManager.h"
 #include "HexTile.h"
@@ -144,7 +143,7 @@ void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
 	if (IsValid(lastClicked))
 	{
 		lastClicked->setMovementLeft(0);
-		//setIdle(lastClicked);
+		lastClicked->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character->m_idleAnim, true);
 		lastClicked->setArrowOn(false);
 		hexManager->highlightsOff();
 	}
@@ -257,6 +256,17 @@ void APlayerManager::characterClicked(APlayerCharacter* character)
 		resetCommands();
 		return;
 	}
+	if (m_selectedCharacter->AIAttack == true)
+	{
+		if (character->getHexLocation() == m_selectedCharacter->AITarget)
+		{	
+			hexManager->HexGridArray[m_selectedCharacter->AITarget]->setAttackSelectHighightVisible(false);
+			m_selectedCharacter->AIAttack = false;
+			return;
+		}
+		else
+			resetCommands();
+	}
 	if (hexManager->HexGridArray[character->m_hexLocationIndex]->atkHighlight == true)
 	{	
 		int movements{ characterMovement.Num() };
@@ -265,9 +275,11 @@ void APlayerManager::characterClicked(APlayerCharacter* character)
 		if (movements > 0)
 		{
 			m_selectedCharacter->AIAttack = hexManager->calculateMovement(characterMovement, character->getHexLocation(), characterMovement[movements - 1],
-				m_selectedCharacter->m_movementLeft - movements, m_selectedCharacter->m_range);
-			if(m_selectedCharacter->AIAttack)
+				m_selectedCharacter->m_movementLeft - movements, m_selectedCharacter->m_range, true);
+			if (m_selectedCharacter->AIAttack)
+			{
 				chainable = true;
+			}			
 		}
 		if (!chainable)
 		{
@@ -406,11 +418,11 @@ void APlayerManager::checkGameOver()
 	}
 	else if (enemyAlive)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Enemies win!"));
+		GameOver.Broadcast(false);
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Players win!"));
+		GameOver.Broadcast(true);
 	}
 }
 

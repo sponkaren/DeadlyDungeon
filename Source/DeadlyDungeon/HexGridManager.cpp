@@ -202,7 +202,7 @@ int AHexGridManager::getNextEnemySpawn(int enemies)
 {
 	for (int r{ 1 }; r < 3; ++r)
 	{
-		for (int i{ ((m_gridWidth / enemies) * m_gridHeight) - r }; i < HexGridArray.Num(); i += m_gridHeight)
+		for (int i{(((m_gridWidth / enemies)+r) * m_gridHeight)-1}; i < HexGridArray.Num(); i += m_gridHeight)
 		{
 			if (!HexGridArray[i]->getOccupied())
 			{

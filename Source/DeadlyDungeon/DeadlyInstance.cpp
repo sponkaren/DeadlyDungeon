@@ -41,13 +41,15 @@ void UDeadlyInstance::DungeonSetup()
     {
         playerManager = Cast<APlayerManager>(playerActor);
         playerManager->PlayerDeath.AddDynamic(this, &UDeadlyInstance::DeleteCharacter);
+        playerManager->GameOver.AddDynamic(this, &UDeadlyInstance::setGameOver);
+        
         if (SaveGameObject->alivePlayers.Num() > 0)
         {
             spawnWidgets();
             playerManager->turnActionWidgetSetup(turnActionWidget);
             playerManager->turnOrderWidgetSetup(turnOrderWidget);
             playerManager->handlePlayersToSpawn(SaveGameObject->alivePlayers);
-            playerManager->spawnEnemies(1,5);
+            playerManager->spawnEnemies(1,4);
         }   
     }
 }
@@ -131,6 +133,11 @@ void UDeadlyInstance::spawnWidgets()
 {
     GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Spawning that shit"));
 
+    turnActionWidget = nullptr;
+    turnOrderWidget = nullptr;
+    endScreenWidget = nullptr;
+
+
     if (turnActionWidgetClass)
     {
         if (!turnActionWidget)
@@ -149,4 +156,28 @@ void UDeadlyInstance::spawnWidgets()
         }
     }
 
+}
+
+bool UDeadlyInstance::characterExists()
+{
+    return menuManager->characterExists(); 
+}
+
+void UDeadlyInstance::setGameOver(bool win)
+{    
+    if (endScreenWidgetClass)
+    {
+        if (!endScreenWidget)
+        {
+            endScreenWidget = CreateWidget<UEndScreenWidget>(this, endScreenWidgetClass);
+            endScreenWidget->setText(win);
+            endScreenWidget->AddToViewport();
+            endScreenWidget->ToMenu.AddDynamic(this, &UDeadlyInstance::goToMenu);
+        }
+    }
+}
+
+void UDeadlyInstance::goToMenu()
+{
+    UGameplayStatics::OpenLevel(this, LevelToLoad);
 }
