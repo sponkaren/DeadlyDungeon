@@ -3,6 +3,9 @@
 
 #include "StatGenerator.h"
 #include "Math/UnrealMathUtility.h"
+#include "RandomNameGenerator.h"
+#include "UObject/Object.h"
+
 
 FPlayerStruct StatGenerator::generateStats(int level, int ID)
 {
@@ -10,8 +13,13 @@ FPlayerStruct StatGenerator::generateStats(int level, int ID)
 	
 	FPlayerStruct stats;
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Rand: %i"),
-		randomStruct));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Rand: %i"),
+	//	randomStruct));
+
+	FString characterName = RandomNameGenerator::getRandomName();
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Name: %s"),
+		*FString(characterName)));
 
 	switch (randomStruct)
 	{
@@ -33,7 +41,8 @@ FPlayerStruct StatGenerator::generateStats(int level, int ID)
 			//float maxHealth
 			100,
 			//int range
-			1
+			1,
+			characterName
 		};
 		break;
 	case 2:
@@ -53,7 +62,8 @@ FPlayerStruct StatGenerator::generateStats(int level, int ID)
 			//float maxHealth
 			80,
 			//int range
-			2
+			2,
+			characterName
 		};
 		break;
 	}
@@ -61,8 +71,10 @@ FPlayerStruct StatGenerator::generateStats(int level, int ID)
 	return stats;
 }
 
+
+
 StatGenerator::StatGenerator()
-{
+{	
 }
 
 StatGenerator::~StatGenerator()

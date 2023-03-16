@@ -43,11 +43,12 @@ void APlayerCharacter::setStats(FPlayerStruct& stats)
 	m_numberOfAttacks = stats.numberOfAttacks;
 	m_maxHealth = stats.maxHealth;
 	m_range = stats.range;
+	m_name = stats.name;
 }
 
 FPlayerStruct APlayerCharacter::getStats()
 {
-	FPlayerStruct playerStruct = {m_ID, static_cast<uint8>(m_characterClass), m_initiative, m_movement, m_attack, m_numberOfAttacks, m_maxHealth, m_range };
+	FPlayerStruct playerStruct = {m_ID, static_cast<uint8>(m_characterClass), m_initiative, m_movement, m_attack, m_numberOfAttacks, m_maxHealth, m_range,m_name};
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("m_ID is: %i"),
 		m_ID));
 	return playerStruct;
@@ -381,6 +382,10 @@ void APlayerCharacter::createRenderTarget()
 	iconMaterial->SetTextureParameterValue("TextureParam", textureRenderTarget);
 }
 
+const FString& APlayerCharacter::getName()
+{
+	return m_name;
+}
 
 
 APlayerCharacter& APlayerCharacter::getCharacter()

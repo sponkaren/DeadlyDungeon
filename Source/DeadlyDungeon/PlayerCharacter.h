@@ -35,6 +35,8 @@ public:
 	float maxHealth;
 	UPROPERTY()
 	int range;
+	UPROPERTY()
+	FString name;
 };
 
 UENUM(BlueprintType)
@@ -100,6 +102,9 @@ public:
 
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 	int m_range;
+
+	UPROPERTY(VisibleInstanceOnly, Category = "Player")
+	FString m_name;
 	//end of stats
 
 
@@ -274,6 +279,9 @@ public:
 	void corpseHit(ACharacterProjectile* projectile);
 
 	void createRenderTarget();
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	const FString& getName();
 
 	APlayerCharacter& getCharacter();
 };
