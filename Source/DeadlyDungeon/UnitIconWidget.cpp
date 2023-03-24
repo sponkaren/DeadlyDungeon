@@ -17,8 +17,16 @@ void UUnitIconWidget::activeTurn(bool on)
 }
 
 void UUnitIconWidget::onIconHover(bool on)
-{
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Hovered AF!"));
-	
+{	
 	IconHovered.Broadcast(this, on);
+}
+
+void UUnitIconWidget::setCharacterPointer(APlayerCharacter* character)
+{
+	m_character = character;
+}
+
+void UUnitIconWidget::unitIconClicked()
+{
+	IconClick.Broadcast(m_character);
 }

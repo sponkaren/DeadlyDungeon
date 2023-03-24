@@ -55,19 +55,51 @@ void APlayerManager::turnOrderWidgetSetup(UTurnOrderWidget* widget)
 {
 	turnOrderWidget = widget;
 	turnOrderWidget->HoverChange.AddDynamic(this, &APlayerManager::hoverChange);
+	turnOrderWidget->IconClicked.AddDynamic(this, &APlayerManager::populateInfo);
+}
+
+void APlayerManager::unitInfoWidgetSetup(UUnitInfoWidget* widget)
+{
+	unitInfoWidget = widget;
+}
+
+void APlayerManager::populateInfo(APlayerCharacter* character)
+{
+	if (!unitInfoWidget)
+	{
+		return;
+	}
+
+	if (populator)
+	{
+		populator->infoPopup = false;
+	}
+
+	populator = character;
+	character->infoPopup = true;
+
+	unitInfoWidget->setText(character->getStats());
+
+	unitInfoWidget->setImage(character->iconMaterial);
+
 }
 
 void APlayerManager::setTurnOrderIcons()
 {
 	for (APlayerCharacter* player : CharacterArray)
 	{
-		addIconTurnOrder(player->iconMaterial);
+		addIconTurnOrder(player->iconMaterial, player);
+	}
+
+	if (CharacterArray.Num() > 0)
+	{
+		populateInfo(CharacterArray[0]);		
 	}
 }
 
-void APlayerManager::addIconTurnOrder(UMaterialInterface* characterIcon)
+void APlayerManager::addIconTurnOrder(UMaterialInterface* characterIcon, APlayerCharacter* character)
 {	
-	turnOrderWidget->createUnitIcon(characterIcon);
+	turnOrderWidget->createUnitIcon(characterIcon, character);
 }
 
 void APlayerManager::handlePlayersToSpawn(TArray<FPlayerStruct>& players)
@@ -129,6 +161,7 @@ void APlayerManager::spawnPlayer(FPlayerStruct& stats, int hexIndex, bool enemy)
 	newPlayer->CharClicked.AddDynamic(this, &APlayerManager::characterClicked);
 	newPlayer->CharIdle.AddDynamic(this, &APlayerManager::setIdle);
 	newPlayer->CharShot.AddDynamic(this, &APlayerManager::characterShot);
+	newPlayer->CharSelect.AddDynamic(this, &APlayerManager::populateInfo);
 
 	//addIconTurnOrder(newPlayer->iconMaterial);
 }
@@ -608,4 +641,5 @@ void APlayerManager::hoverChange(int index, bool on)
 		CharacterArray[index]->setArrowOn(on);
 	}
 
+	CharacterArray[index]->beingHovered = on;
 }

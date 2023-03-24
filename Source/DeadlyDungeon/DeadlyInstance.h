@@ -10,6 +10,7 @@
 #include "TurnActionWidget.h"
 #include "TurnOrderWidget.h"
 #include "EndScreenWidget.h"
+#include "UnitInfoWidget.h"
 #include "DeadlyInstance.generated.h"
 
 /**
@@ -78,6 +79,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player, HUD and UI")
 	class UEndScreenWidget* endScreenWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player, HUD and UI")
+	TSubclassOf<class UUnitInfoWidget> unitInfoWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player, HUD and UI")
+	class UUnitInfoWidget* unitInfoWidget;
 
 	UPROPERTY(EditAnywhere)
 	FName LevelToLoad;

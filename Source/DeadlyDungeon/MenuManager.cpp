@@ -55,6 +55,8 @@ void AMenuManager::spawnAlivePlayers(TArray<FPlayerStruct>& players)
 			APlayerCharacter* player = GetWorld()->SpawnActorDeferred<APlayerCharacter>(playerCharacter, SpawnTransform);
 			player->Init(stats);
 			player->FinishSpawning(SpawnTransform);
+			player->createRenderTarget();
+			player->CharSelect.AddDynamic(this, &AMenuManager::populateInfo);
 		}
 		++i;
 	}
@@ -89,7 +91,9 @@ void AMenuManager::whenHexClicked(AHexTile* hex)
 		FPlayerStruct stats{ StatGenerator::generateStats(1,m_ID)};
 		newPlayer->Init(stats);
 		newPlayer->FinishSpawning(SpawnTransform);
-
+		newPlayer->createRenderTarget();
+		newPlayer->CharSelect.AddDynamic(this, &AMenuManager::populateInfo);
+		populateInfo(newPlayer);
 		CharacterCreated.Broadcast(newPlayer);
 	}
 }
@@ -111,4 +115,24 @@ bool AMenuManager::characterExists()
 			exists = true;
 	}
 	return exists;
+}
+
+void AMenuManager::populateInfo(APlayerCharacter* character)
+{
+	if (!unitInfoWidget)
+	{
+		return;
+	}
+
+	if (populator)
+	{
+		populator->infoPopup = false;
+	}
+
+	populator = character;
+	character->infoPopup = true;
+
+	unitInfoWidget->setText(character->getStats());
+
+	unitInfoWidget->setImage(character->iconMaterial);
 }

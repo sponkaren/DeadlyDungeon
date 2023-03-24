@@ -13,6 +13,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharClicked, APlayerCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharIdle, APlayerCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharShot, APlayerCharacter*, character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharSelect, APlayerCharacter*, character);
 
 USTRUCT(BlueprintType)
 struct FPlayerStruct
@@ -123,6 +124,9 @@ public:
 	UPROPERTY(VisibleInstanceOnly, Category = "Player")
 	int AITarget{0};
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+	bool beingHovered{ false };
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player")
 	CharacterType m_type {CharacterType::ALLY};
 
@@ -209,6 +213,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Player")
 	bool arrowOn{ false };
 
+	UPROPERTY(BlueprintReadWrite, Category = "Player")
+	bool infoPopup{ false };
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -231,6 +238,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 	FOnCharShot CharShot;
+
+	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
+	FOnCharSelect CharSelect;
 
 	void setIndex(int index);
 	int getIndex();
@@ -274,6 +284,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void characterClicked();
+
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	void characterSelected();
 
 	UFUNCTION()
 	void corpseHit(ACharacterProjectile* projectile);

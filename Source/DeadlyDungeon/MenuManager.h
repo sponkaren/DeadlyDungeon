@@ -6,6 +6,7 @@
 #include "HexTile.h"	
 #include "PlayerCharacter.h"
 #include "GameFramework/Actor.h"
+#include "UnitInfoWidget.h"
 #include "MenuManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterCreated, APlayerCharacter*, character);
@@ -38,12 +39,17 @@ protected:
 
 	FRotator Rotation;
 
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 	FOnCharacterCreated CharacterCreated;
+
+	UUnitInfoWidget* unitInfoWidget;
+
+	APlayerCharacter* populator;
 
 	int m_ID;
 
@@ -59,4 +65,7 @@ public:
 	void getHex();
 
 	bool characterExists();
+
+	UFUNCTION()
+	void populateInfo(APlayerCharacter* character);
 };

@@ -367,6 +367,12 @@ void APlayerCharacter::characterClicked()
 	CharClicked.Broadcast(this);
 }
 
+void APlayerCharacter::characterSelected()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Clicked!"));
+	CharSelect.Broadcast(this);
+}
+
 void APlayerCharacter::createRenderTarget()
 {
 	//Creating render target

@@ -3,14 +3,16 @@
 
 #include "TurnOrderWidget.h"
 
-void UTurnOrderWidget::createUnitIcon(UMaterialInterface*texture)
+void UTurnOrderWidget::createUnitIcon(UMaterialInterface*texture, APlayerCharacter* character)
 {
 
     iconWidget = CreateWidget<UUnitIconWidget>(this, iconWidgetClass);
 	iconWidget->setImage(texture);
+	iconWidget->setCharacterPointer(character);
 	verticalBox->AddChild(iconWidget);	
 	iconArray.Emplace(iconWidget);
 	iconWidget->IconHovered.AddDynamic(this, &UTurnOrderWidget::iconHovered);
+	iconWidget->IconClick.AddDynamic(this, &UTurnOrderWidget::iconWasClicked);
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Adding Icon!"));
 }
 
@@ -42,4 +44,9 @@ void UTurnOrderWidget::deleteIcon(int index)
 {
 	iconArray[index]->RemoveFromParent();
 	iconArray.RemoveAt(index);
+}
+
+void UTurnOrderWidget::iconWasClicked(APlayerCharacter* character)
+{
+	IconClicked.Broadcast(character);
 }

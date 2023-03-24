@@ -8,6 +8,7 @@
 #include "HexGridManager.h"
 #include "TurnActionWidget.h"
 #include "TurnOrderWidget.h"
+#include "UnitInfoWidget.h"
 #include "PlayerManager.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDeath, int, ID);
@@ -58,6 +59,8 @@ protected:
 
 	UTurnOrderWidget* turnOrderWidget;
 
+	UUnitInfoWidget* unitInfoWidget;
+
 	UPROPERTY(EditAnywhere, Category = "Player Management")
 	UMaterialInterface* iconMaterial;
 
@@ -69,6 +72,8 @@ protected:
 	APlayerCharacter* m_selectedCharacter;
 
 	APlayerCharacter* lastClicked;
+
+	APlayerCharacter* populator;
 
 	int maxPlayers{ 100 };
 
@@ -95,9 +100,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void turnOrderWidgetSetup(UTurnOrderWidget* widget);
 
+	UFUNCTION(BlueprintCallable, Category = "Player Management")
+	void unitInfoWidgetSetup(UUnitInfoWidget* widget);
+
 	void setTurnOrderIcons();
 
-	void addIconTurnOrder(UMaterialInterface* characterIcon);
+	void addIconTurnOrder(UMaterialInterface* characterIcon, APlayerCharacter* character);
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	void handlePlayersToSpawn(TArray<FPlayerStruct>& players);
@@ -164,4 +172,7 @@ public:
 
 	UFUNCTION()
 	void hoverChange(int index, bool on);
+
+	UFUNCTION()
+	void populateInfo(APlayerCharacter* character);
 };

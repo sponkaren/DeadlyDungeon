@@ -25,6 +25,19 @@ void UDeadlyInstance::MenuSetup()
         {
             menuManager->spawnAlivePlayers(SaveGameObject->alivePlayers);
         }
+
+        unitInfoWidget = nullptr;
+        
+        if (unitInfoWidgetClass)
+        {
+            if (!unitInfoWidget)
+            {
+                unitInfoWidget = CreateWidget<UUnitInfoWidget>(this, unitInfoWidgetClass);
+                unitInfoWidget->AddToViewport();
+                menuManager->unitInfoWidget = unitInfoWidget;
+            }
+        }
+
     }
 
     //playerManager = UGameplayStatics::GetActorOfClass(GetWorld(), AMenuManager::StaticClass());
@@ -48,6 +61,7 @@ void UDeadlyInstance::DungeonSetup()
             spawnWidgets();
             playerManager->turnActionWidgetSetup(turnActionWidget);
             playerManager->turnOrderWidgetSetup(turnOrderWidget);
+            playerManager->unitInfoWidgetSetup(unitInfoWidget);
             playerManager->handlePlayersToSpawn(SaveGameObject->alivePlayers);
             playerManager->spawnEnemies(1,4);
         }   
@@ -136,6 +150,7 @@ void UDeadlyInstance::spawnWidgets()
     turnActionWidget = nullptr;
     turnOrderWidget = nullptr;
     endScreenWidget = nullptr;
+    unitInfoWidget = nullptr;
 
 
     if (turnActionWidgetClass)
@@ -153,6 +168,15 @@ void UDeadlyInstance::spawnWidgets()
         {
             turnOrderWidget = CreateWidget<UTurnOrderWidget>(this, turnOrderWidgetClass);
             turnOrderWidget->AddToViewport();
+        }
+    }
+
+    if (unitInfoWidgetClass)
+    {
+        if (!unitInfoWidget)
+        {
+            unitInfoWidget = CreateWidget<UUnitInfoWidget>(this, unitInfoWidgetClass);
+            unitInfoWidget->AddToViewport();
         }
     }
 
