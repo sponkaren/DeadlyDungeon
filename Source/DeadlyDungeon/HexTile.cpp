@@ -115,6 +115,27 @@ int AHexTile::getDistance(const AHexTile& refHex)
 	return 100;
 }
 
+void AHexTile::setMovePrio(int prio, bool debug)
+{
+	movePrio = prio;
+	
+	if (debug)
+	{
+		displayMovePrio();
+	}
+	if(!debug)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No debug!"));
+
+}
+
+void AHexTile::displayMovePrio()
+{
+	if (movePrio != -1)
+	{
+		movePrioOn = true;
+	}
+}
+
 AHexTile& AHexTile::getHex()
 {
 	return *this;

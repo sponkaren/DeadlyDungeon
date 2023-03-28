@@ -643,3 +643,9 @@ void APlayerManager::hoverChange(int index, bool on)
 
 	CharacterArray[index]->beingHovered = on;
 }
+
+void APlayerManager::setDebugMode(bool on)
+{
+	debugMode = true;
+	hexManager->debugMode = debugMode;
+}

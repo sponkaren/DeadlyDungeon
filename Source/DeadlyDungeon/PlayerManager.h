@@ -85,6 +85,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	bool debugMode{ false };
+
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 	FOnPlayerDeath PlayerDeath;
 
@@ -169,6 +171,8 @@ public:
 	bool validateAttack(int hexIndex);
 
 	void resetCommands();
+
+	void setDebugMode(bool on);
 
 	UFUNCTION()
 	void hoverChange(int index, bool on);

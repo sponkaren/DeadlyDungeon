@@ -49,28 +49,33 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Tile")
 	EHexTileType m_tileType {};
 
-	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
+	UPROPERTY(VisibleInstanceOnly, Category = "Tile")
 	bool m_occupied{};
 
-	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
+	UPROPERTY(VisibleInstanceOnly, Category = "Tile")
 	FVector m_location{};
 
-	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
+	UPROPERTY(VisibleInstanceOnly, Category = "Tile")
 	int m_axialR{};
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Tile");
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Tile")
 	int m_axialQ{};
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Tile");
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Tile")
 	int m_axialS{};
 
-	UPROPERTY(VisibleInstanceOnly, Category = "Tile");
+	UPROPERTY(VisibleInstanceOnly, Category = "Tile")
 	int m_index{};
 
 	bool inRange{ false };
 	bool atkHighlight{ false };
 
+	UPROPERTY(BlueprintReadWrite, Category = "Tile")
 	int movePrio{-1};
+	
+	UPROPERTY(BlueprintReadWrite, Category ="Tile")
+	bool movePrioOn{ false };
+	
 	int gStar{};
 
 	bool moveBlock{ false };
@@ -109,6 +114,10 @@ public:
 	void setAttackSelectHighightVisible(bool on);
 
 	int getDistance(const AHexTile& refHex);
+
+	void setMovePrio(int prio, bool debug = false);
+
+	void displayMovePrio();
 
 	AHexTile& getHex();
 };

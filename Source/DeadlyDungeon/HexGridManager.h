@@ -50,6 +50,8 @@ public:
 	
 	AHexGridManager();
 
+	bool debugMode{ false };
+
 	TArray<AHexTile*> HexGridArray;
 
 	TArray<int> hexIndexes;

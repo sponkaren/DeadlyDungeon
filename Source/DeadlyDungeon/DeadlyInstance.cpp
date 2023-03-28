@@ -53,6 +53,7 @@ void UDeadlyInstance::DungeonSetup()
     if (playerActor)
     {
         playerManager = Cast<APlayerManager>(playerActor);
+
         playerManager->PlayerDeath.AddDynamic(this, &UDeadlyInstance::DeleteCharacter);
         playerManager->GameOver.AddDynamic(this, &UDeadlyInstance::setGameOver);
         
@@ -64,6 +65,7 @@ void UDeadlyInstance::DungeonSetup()
             playerManager->unitInfoWidgetSetup(unitInfoWidget);
             playerManager->handlePlayersToSpawn(SaveGameObject->alivePlayers);
             playerManager->spawnEnemies(1,4);
+            playerManager->setDebugMode(true);
         }   
     }
 }

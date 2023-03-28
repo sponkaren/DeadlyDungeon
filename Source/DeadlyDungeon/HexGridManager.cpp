@@ -286,7 +286,7 @@ int AHexGridManager::findClosestRangeTarget(int hexIndex, const TArray<int>& tar
 
 bool AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range, bool highlighting)
 {
-	setPriorities(targetHex, hexIndex, range);
+	setPriorities(targetHex, hexIndex, range);	
 
 	int locPrio = HexGridArray[hexIndex]->movePrio;
 	
@@ -301,7 +301,11 @@ bool AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHe
 	//	locPrio));
 
 	movementCalc(movementArray, hexIndex, movementLeft, locPrio, range, highlighting);
-	clearPriorities();
+
+	if (!debugMode)
+	{
+		clearPriorities();
+	}
 	
 	if (locPrio <= range)
 	{
@@ -457,8 +461,9 @@ void AHexGridManager::setPriorities(int targetHex, int locHex, int range, bool r
 					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Setting new moveprio: %i"),
 					//HexGridArray[hexIndex]->movePrio + 1));
 
-					hex->movePrio = HexGridArray[hexIndex]->movePrio+1;
-					
+					//hex->movePrio = HexGridArray[hexIndex]->movePrio+1;
+
+					hex->setMovePrio(HexGridArray[hexIndex]->movePrio + 1, debugMode);
 					
 					if (hex->m_index == locHex)
 					{
@@ -470,13 +475,9 @@ void AHexGridManager::setPriorities(int targetHex, int locHex, int range, bool r
 				}
 			}
 		}	
-		sortByGStar(i);
+		sortByGStar(i);		
 	}
-		
-
-
-
-
+	
 	/*
 	for (int p{ 0 };; ++p)
 	{
@@ -527,6 +528,7 @@ void AHexGridManager::clearPriorities()
 	{
 		hex->moveBlock = false;
 		hex->movePrio = -1;	
+		hex->movePrioOn = false;
 		hex->gStar = 0;
 	}
 }
