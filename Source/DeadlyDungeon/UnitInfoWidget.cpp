@@ -3,12 +3,16 @@
 
 #include "UnitInfoWidget.h"
 #include "Containers/UnrealString.h"
-
 #include "Internationalization/Text.h"
 
 void UUnitInfoWidget::setImage(UMaterialInterface* texture)
 {
 	IconImage->SetBrushFromMaterial(texture);
+}
+
+void UUnitInfoWidget::setHealth(float health)
+{
+	healthPercentage = health;
 }
 
 void UUnitInfoWidget::setText(FPlayerStruct playerStruct)
@@ -27,4 +31,18 @@ void UUnitInfoWidget::setText(FPlayerStruct playerStruct)
 	FString attacksData{ AttacksString + FString::FromInt(playerStruct.numberOfAttacks) };
 	PlayerAttacks->SetText(FText::FromString(attacksData));
 
+}
+
+void UUnitInfoWidget::setVisibilty(bool on)
+{
+	isVisible = on;
+
+	if (on)
+	{
+		UWidget::SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
+	else if (!on)
+	{
+		UWidget::SetVisibility(ESlateVisibility::Hidden);
+	}
 }

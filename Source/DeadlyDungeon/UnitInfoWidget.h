@@ -34,6 +34,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	class URichTextBlock* PlayerAttacks;
+	
+	UPROPERTY(BlueprintReadWrite, Category = "Character Info")
+	float healthPercentage{0.5};
 
 	const FString MovementString{"Movement: " };
 	const FString DamageString{"Damage: " };
@@ -41,7 +44,13 @@ protected:
 	const FString AttacksString{"Attacks: " };
 
 public:
+	bool isVisible{ true };
+
 	void setImage(UMaterialInterface* texture);
 
+	void setHealth(float health);
+
 	void setText(FPlayerStruct playerStruct);
+
+	void setVisibilty(bool on);
 };

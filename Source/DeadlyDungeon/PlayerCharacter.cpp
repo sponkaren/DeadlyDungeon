@@ -129,6 +129,37 @@ void APlayerCharacter::Tick(float DeltaTime)
 			startIdling();
 		}
 	}
+
+	if (isBlasting)
+	{
+		if (m_blastWait > 0)
+		{
+			m_blastWait -= DeltaTime;
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Blasting!"));
+			return;
+		}
+		else
+		{	
+			isBlasting = false;			
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Blasted!"));
+			BlastDone.Broadcast(m_attack);
+		}
+	}
+
+	if (!isBlasting && m_blastWait <= 0)
+	{
+		if(m_blastWait2 > 0)
+		{
+			m_blastWait2 -= DeltaTime;
+			return;
+		}
+		else
+		{
+			m_blastWait = 1.5;
+			m_blastWait2 = 0.5;
+			m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_attackAnim, true);
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -386,6 +417,13 @@ void APlayerCharacter::createRenderTarget()
 
 	iconMaterial = UMaterialInstanceDynamic::Create(iconMaterialBase, this);
 	iconMaterial->SetTextureParameterValue("TextureParam", textureRenderTarget);
+}
+
+void APlayerCharacter::setBlasting()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Set to Blast!"));
+	m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_blastAnim, false);
+	isBlasting = true;
 }
 
 const FString& APlayerCharacter::getName()

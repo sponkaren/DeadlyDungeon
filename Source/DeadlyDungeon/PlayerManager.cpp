@@ -79,7 +79,7 @@ void APlayerManager::populateInfo(APlayerCharacter* character)
 	character->infoPopup = true;
 
 	unitInfoWidget->setText(character->getStats());
-
+	unitInfoWidget->setHealth(character->getCurrentHealthPercent());
 	unitInfoWidget->setImage(character->iconMaterial);
 
 }
@@ -162,6 +162,7 @@ void APlayerManager::spawnPlayer(FPlayerStruct& stats, int hexIndex, bool enemy)
 	newPlayer->CharIdle.AddDynamic(this, &APlayerManager::setIdle);
 	newPlayer->CharShot.AddDynamic(this, &APlayerManager::characterShot);
 	newPlayer->CharSelect.AddDynamic(this, &APlayerManager::populateInfo);
+	newPlayer->BlastDone.AddDynamic(this, &APlayerManager::dealDamage);
 
 	//addIconTurnOrder(newPlayer->iconMaterial);
 }
@@ -331,17 +332,50 @@ void APlayerManager::characterAttacked(APlayerCharacter* character)
 {
 	if (validateAttack(character->getHexLocation()))
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Attack!"));
 		m_selectedCharacter->rotateTo(character->getLocation());
+
+		m_selectedCharacter->setBlasting();
+
+		attackedCharacter = character;
+
+		/*
 		if (character->updateHealth(true, m_selectedCharacter->getAttack()))
 		{
 			removeCharacter(*character);
 		}
+
+		if (character == populator)
+		{
+			unitInfoWidget->setHealth(character->getCurrentHealthPercent());
+		}
+
 		if (--m_selectedCharacter->m_numberOfAttacksLeft <= 0)
 		{
 			setIdle(m_selectedCharacter);
 		}
+		*/
 	}
+}
+
+void APlayerManager::dealDamage(float attack)
+{
+
+	if (attackedCharacter->updateHealth(true, attack))
+	{
+		removeCharacter(*attackedCharacter);
+	}
+
+	if (attackedCharacter == populator)
+	{
+		unitInfoWidget->setHealth(attackedCharacter->getCurrentHealthPercent());
+	}
+
+	if (--m_selectedCharacter->m_numberOfAttacksLeft <= 0)
+	{
+		setIdle(m_selectedCharacter);
+	}
+
+	attackedCharacter = nullptr;
 }
 
 void APlayerManager::whenHexClicked(AHexTile* hex)
@@ -478,7 +512,7 @@ void APlayerManager::setIndexes()
 
 void APlayerManager::setNextTurn()
 {
-	if (!m_selectedCharacter->getMoving())
+	if (!m_selectedCharacter->getMoving() && !m_selectedCharacter->isBlasting)
 	{
 		if (turnIndex < CharacterArray.Num() - 1)
 		{

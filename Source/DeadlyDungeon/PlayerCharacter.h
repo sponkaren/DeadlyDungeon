@@ -14,6 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharClicked, APlayerCharacter*, c
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharIdle, APlayerCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharShot, APlayerCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharSelect, APlayerCharacter*, character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBlast, float, attack);
 
 USTRUCT(BlueprintType)
 struct FPlayerStruct
@@ -74,8 +75,10 @@ public:
 	{
 		IDLE, 
 		MOVING,
-		ATTACKING,		
+		ATTACKING,
 	};
+
+	bool isBlasting{ false };
 
 	e_state m_state{ IDLE };
 
@@ -182,6 +185,9 @@ public:
 	UAnimationAsset* m_attackAnim;
 
 	UPROPERTY(EditDefaultsOnly)
+	UAnimationAsset* m_blastAnim;
+
+	UPROPERTY(EditDefaultsOnly)
 	UAnimationAsset* m_TPose;
 
 	UPROPERTY(EditAnywhere, Category = "Materials")
@@ -209,6 +215,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float m_waitTime2{ baseWait };
+
+	float m_blastWait{ 1.5 };
+	float m_blastWait2{ 0.5 };
 
 	UPROPERTY(BlueprintReadWrite, Category = "Player")
 	bool arrowOn{ false };
@@ -241,6 +250,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 	FOnCharSelect CharSelect;
+
+	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
+	FOnBlast BlastDone;
 
 	void setIndex(int index);
 	int getIndex();
@@ -295,6 +307,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Player Management")
 	const FString& getName();
+
+	void setBlasting();
 
 	APlayerCharacter& getCharacter();
 };

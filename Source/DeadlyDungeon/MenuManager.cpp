@@ -118,7 +118,7 @@ bool AMenuManager::characterExists()
 }
 
 void AMenuManager::populateInfo(APlayerCharacter* character)
-{
+{	
 	if (!unitInfoWidget)
 	{
 		return;
@@ -129,10 +129,18 @@ void AMenuManager::populateInfo(APlayerCharacter* character)
 		populator->infoPopup = false;
 	}
 
+	if (!unitInfoWidget->isVisible)
+	{
+		unitInfoWidget->setVisibilty(true);
+	}
+
 	populator = character;
 	character->infoPopup = true;
 
 	unitInfoWidget->setText(character->getStats());
+	
+	//always max hp in the menu
+	unitInfoWidget->setHealth(1);
 
 	unitInfoWidget->setImage(character->iconMaterial);
 }

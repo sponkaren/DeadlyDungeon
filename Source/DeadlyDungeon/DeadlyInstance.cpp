@@ -33,8 +33,9 @@ void UDeadlyInstance::MenuSetup()
             if (!unitInfoWidget)
             {
                 unitInfoWidget = CreateWidget<UUnitInfoWidget>(this, unitInfoWidgetClass);
-                unitInfoWidget->AddToViewport();
+                unitInfoWidget->AddToViewport();                
                 menuManager->unitInfoWidget = unitInfoWidget;
+                unitInfoWidget->setVisibilty(false);
             }
         }
 

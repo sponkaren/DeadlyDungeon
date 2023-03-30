@@ -75,6 +75,8 @@ protected:
 
 	APlayerCharacter* populator;
 
+	APlayerCharacter* attackedCharacter;
+
 	int maxPlayers{ 100 };
 
 	int turnIndex;
@@ -133,6 +135,9 @@ public:
 	void characterClicked(APlayerCharacter* character);
 
 	void characterAttacked(APlayerCharacter* character);
+
+	UFUNCTION()
+	void dealDamage(float attack);
 
 	void removeCharacter(APlayerCharacter& character, bool shot=false);
 
