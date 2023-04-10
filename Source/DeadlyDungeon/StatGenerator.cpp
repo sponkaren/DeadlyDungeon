@@ -10,7 +10,7 @@
 FPlayerStruct StatGenerator::generateStats(int level, int ID)
 {
 	int randomStruct = FMath::RandRange(1, 2);
-	
+	int randomInit = FMath::RandRange(1, 9);
 	FPlayerStruct stats;
 	
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Rand: %i"),
@@ -18,8 +18,8 @@ FPlayerStruct StatGenerator::generateStats(int level, int ID)
 
 	FString characterName = RandomNameGenerator::getRandomName();
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Name: %s"),
-		*FString(characterName)));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Name: %s"),
+	//	*FString(characterName)));
 
 	switch (randomStruct)
 	{
@@ -31,7 +31,7 @@ FPlayerStruct StatGenerator::generateStats(int level, int ID)
 			//character class
 			static_cast<uint8>(ECharacterClass::WARRIOR),
 			//int initiative
-			5,
+			randomInit,
 			//int movement
 			3,
 			//float attack
@@ -39,7 +39,7 @@ FPlayerStruct StatGenerator::generateStats(int level, int ID)
 			//int numberOfAttacks
 			1,
 			//float maxHealth
-			100,
+			80,
 			//int range
 			1,
 			characterName
@@ -52,7 +52,7 @@ FPlayerStruct StatGenerator::generateStats(int level, int ID)
 			ID,
 			static_cast<uint8>(ECharacterClass::RANGER),
 			//int initiative
-			5,
+			randomInit,
 			//int movement
 			3,
 			//float attack
@@ -60,7 +60,7 @@ FPlayerStruct StatGenerator::generateStats(int level, int ID)
 			//int numberOfAttacks
 			1,
 			//float maxHealth
-			80,
+			60,
 			//int range
 			2,
 			characterName

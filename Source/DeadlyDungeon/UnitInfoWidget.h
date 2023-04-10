@@ -34,6 +34,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	class URichTextBlock* PlayerAttacks;
+
+	UPROPERTY(meta = (BindWidget))
+	class URichTextBlock* healthRemaining;
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Character Info")
 	float healthPercentage{0.5};
@@ -48,7 +51,7 @@ public:
 
 	void setImage(UMaterialInterface* texture);
 
-	void setHealth(float health);
+	void setHealth (float health, float maxHealth, float currentHealth);
 
 	void setText(FPlayerStruct playerStruct);
 

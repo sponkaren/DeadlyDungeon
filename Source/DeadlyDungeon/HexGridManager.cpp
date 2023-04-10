@@ -71,7 +71,7 @@ void AHexGridManager::whenHexClicked(AHexTile* hex)
 	{
 		if (hex->getOccupied())
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Slot Occupied"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Slot Occupied"));
 			return;
 		}
 		else
@@ -223,7 +223,6 @@ int AHexGridManager::getNextEnemySpawn(int enemies)
 	return 999;
 }
 
-
 int AHexGridManager::findClosestTarget(int hexIndex, const TArray<int>& targets, int range, bool highlighting, int movementLeft)
 {
 	int targetIndex{-1};
@@ -291,14 +290,11 @@ bool AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHe
 	int locPrio = HexGridArray[hexIndex]->movePrio;
 	
 	//Already in prime position, no need for calculations
-	if (locPrio == range)
+	if (locPrio <= range)
 	{
 		clearPriorities();
 		return true;
 	}
-
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("locPrio: %i"),
-	//	locPrio));
 
 	movementCalc(movementArray, hexIndex, movementLeft, locPrio, range, highlighting);
 
@@ -307,16 +303,7 @@ bool AHexGridManager::calculateMovement(TArray<int>& movementArray, int targetHe
 		clearPriorities();
 	}
 	
-	if (locPrio <= range)
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Returning true!"));
-		return true;
-	}
-	else
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Returning false!"));
-		return false;
-	}
+	return locPrio <= range;
 }
 
 void AHexGridManager::calculateMoveTowards(TArray<int>& movementArray, int targetHex, int hexIndex, int movementLeft, int range)
@@ -398,8 +385,8 @@ void AHexGridManager::movementCalc(TArray<int>& movementArray, int hexIndex, int
 
 		if (nextFound)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Adding index: %i"),
-				nextIndex));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Adding index: %i"),
+			//	nextIndex));
 			movementArray.Emplace(nextIndex);
 			if (highlighting)
 			{
@@ -437,8 +424,7 @@ void AHexGridManager::setPriorities(int targetHex, int locHex, int range, bool r
 
 	HexGridArray[targetHex]->movePrio = p;	
 	hexIndexes.Emplace(targetHex);
-	HexGridArray[targetHex]->gStar = getGStar(HexGridArray[targetHex], HexGridArray[locHex]);
-	int bestG{HexGridArray[targetHex]->gStar};
+	HexGridArray[targetHex]->AIDistance = getRelativeDistance(HexGridArray[targetHex], HexGridArray[locHex]);
 
 	for (int i{0};i<hexIndexes.Num(); ++i)
 	{		
@@ -448,8 +434,6 @@ void AHexGridManager::setPriorities(int targetHex, int locHex, int range, bool r
 		{
 			for (AHexTile* hex : HexGridArray[hexIndex]->adjacentHex)
 			{
-				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Checks done: %i"),
-				//	++checks));
 				
 				if (hex->movePrio == -1)
 				{
@@ -457,11 +441,6 @@ void AHexGridManager::setPriorities(int targetHex, int locHex, int range, bool r
 					{
 						hex->moveBlock = true;
 					}
-					
-					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Setting new moveprio: %i"),
-					//HexGridArray[hexIndex]->movePrio + 1));
-
-					//hex->movePrio = HexGridArray[hexIndex]->movePrio+1;
 
 					hex->setMovePrio(HexGridArray[hexIndex]->movePrio + 1, debugMode);
 					
@@ -471,49 +450,15 @@ void AHexGridManager::setPriorities(int targetHex, int locHex, int range, bool r
 					}					
 					
 					hexIndexes.Emplace(hex->m_index);										
-					hex->gStar = getGStar(hex, HexGridArray[locHex]);
+					hex->AIDistance = getRelativeDistance(hex, HexGridArray[locHex]);
 				}
 			}
 		}	
-		sortByGStar(i);		
+		sortByDistance(i);		
 	}
-	
-	/*
-	for (int p{ 0 };; ++p)
-	{
-		pathFound = false;
-
-		for (int hexIndex : hexIndexes)
-		{
-			if (HexGridArray[hexIndex]->movePrio == p && (!HexGridArray[hexIndex]->moveBlock || rangeCheck))
-			{
-				for(AHexTile* hex : HexGridArray[hexIndex]->adjacentHex)
-				{
-						if (hex->movePrio == -1)
-						{
-							if (hex->m_occupied)
-							{
-								hex->moveBlock = true;
-							}
-							hex->movePrio = p + 1;
-							if (hex->m_index == locHex)
-							{
-								break;
-							}
-							pathFound = true;
-						}
-				}			
-			}			
-		}
-		if (!pathFound)
-		{
-			break;
-		}
-	}
-	*/
 }
 
-int AHexGridManager::getGStar(AHexTile* ref, AHexTile* end)
+int AHexGridManager::getRelativeDistance(AHexTile* ref, AHexTile* end)
 {
 	int diffQ = std::abs(ref->getAxialQ() - end->getAxialQ());
 	int diffR = std::abs(ref->getAxialR() - end->getAxialR());
@@ -529,11 +474,11 @@ void AHexGridManager::clearPriorities()
 		hex->moveBlock = false;
 		hex->movePrio = -1;	
 		hex->movePrioOn = false;
-		hex->gStar = 0;
+		hex->AIDistance = 0;
 	}
 }
 
-void AHexGridManager::sortByGStar(int startIndex)
+void AHexGridManager::sortByDistance(int startIndex)
 {
 	int iA{ startIndex+ 1 };
 	int iB{};
@@ -543,12 +488,9 @@ void AHexGridManager::sortByGStar(int startIndex)
 		iB = iA + 1;
 		for (iB; iB < hexIndexes.Num();++iB)
 		{
-			if (HexGridArray[hexIndexes[iA]]->gStar > HexGridArray[hexIndexes[iB]]->gStar)
+			if (HexGridArray[hexIndexes[iA]]->AIDistance > HexGridArray[hexIndexes[iB]]->AIDistance)
 			{				
 				int temp = hexIndexes[iA];
-				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Pusing temp (A): %i"),
-				//	temp));
-
 				hexIndexes.Push(temp);
 				hexIndexes.RemoveAt(iA);
 
@@ -556,8 +498,6 @@ void AHexGridManager::sortByGStar(int startIndex)
 			else
 			{
 				int temp = hexIndexes[iB];
-			    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Pusing temp (B): %i"),
-				//	temp));
 				hexIndexes.Push(temp);
 				hexIndexes.RemoveAt(iB);
 			}

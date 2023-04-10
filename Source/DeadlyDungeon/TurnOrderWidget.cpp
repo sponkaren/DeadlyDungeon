@@ -13,7 +13,7 @@ void UTurnOrderWidget::createUnitIcon(UMaterialInterface*texture, APlayerCharact
 	iconArray.Emplace(iconWidget);
 	iconWidget->IconHovered.AddDynamic(this, &UTurnOrderWidget::iconHovered);
 	iconWidget->IconClick.AddDynamic(this, &UTurnOrderWidget::iconWasClicked);
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Adding Icon!"));
+    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Adding Icon!"));
 }
 
 void UTurnOrderWidget::setActiveTurn(int index)

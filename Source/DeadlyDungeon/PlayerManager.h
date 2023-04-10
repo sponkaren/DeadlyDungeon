@@ -160,7 +160,7 @@ public:
 	void selectedIdle(bool ally=false);
 
 	UFUNCTION()
-	void setIdle(APlayerCharacter* character);
+	void executeActions(APlayerCharacter* character);
 
 	UFUNCTION()
 	void characterShot(APlayerCharacter* character);

@@ -76,7 +76,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category ="Tile")
 	bool movePrioOn{ false };
 	
-	int gStar{};
+	int AIDistance{};
 
 	bool moveBlock{ false };
 

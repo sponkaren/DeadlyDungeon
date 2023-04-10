@@ -10,9 +10,12 @@ void UUnitInfoWidget::setImage(UMaterialInterface* texture)
 	IconImage->SetBrushFromMaterial(texture);
 }
 
-void UUnitInfoWidget::setHealth(float health)
+void UUnitInfoWidget::setHealth(float health, float maxHealth, float currentHealth)
 {
 	healthPercentage = health;
+
+	FString healthData{ FString::FromInt(static_cast<int>(currentHealth)) + "/" + FString::FromInt(static_cast<int>(maxHealth)) };
+	healthRemaining->SetText(FText::FromString(healthData));
 }
 
 void UUnitInfoWidget::setText(FPlayerStruct playerStruct)
@@ -30,7 +33,6 @@ void UUnitInfoWidget::setText(FPlayerStruct playerStruct)
 	
 	FString attacksData{ AttacksString + FString::FromInt(playerStruct.numberOfAttacks) };
 	PlayerAttacks->SetText(FText::FromString(attacksData));
-
 }
 
 void UUnitInfoWidget::setVisibilty(bool on)

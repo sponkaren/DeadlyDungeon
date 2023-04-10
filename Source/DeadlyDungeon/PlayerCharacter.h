@@ -61,7 +61,7 @@ enum class CharacterType : uint8
 	MAX UMETA (Hidden)
 };
 
-constexpr float baseWait{ 0.1 };
+constexpr float baseWait{ 0.25 };
 
 UCLASS()
 class DEADLYDUNGEON_API APlayerCharacter : public APawn

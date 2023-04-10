@@ -65,8 +65,8 @@ void UDeadlyInstance::DungeonSetup()
             playerManager->turnOrderWidgetSetup(turnOrderWidget);
             playerManager->unitInfoWidgetSetup(unitInfoWidget);
             playerManager->handlePlayersToSpawn(SaveGameObject->alivePlayers);
-            playerManager->spawnEnemies(1,4);
-            playerManager->setDebugMode(true);
+            playerManager->spawnEnemies(1,5);
+            playerManager->setDebugMode(false);
         }   
     }
 }
@@ -77,12 +77,12 @@ void UDeadlyInstance::LoadGame()
     USaveGame* LoadedGame = UGameplayStatics::LoadGameFromSlot(SaveGameSlotName, 0);
     SaveGameObject = Cast<UDeadlySave>(LoadedGame);
         
-    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Trying to load a saved game."));
+    //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Trying to load a saved game."));
 
     // If file does not exist try create a new one
     if (!SaveGameObject)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No saved games found. Trying to save a new one."));
+        //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("No saved games found. Trying to save a new one."));
 
         // Instantiate a new SaveGame object
         SaveGameObject = Cast<UDeadlySave>(UGameplayStatics::CreateSaveGameObject(UDeadlySave::StaticClass()));
@@ -94,13 +94,13 @@ void UDeadlyInstance::LoadGame()
     }
     else
     {
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Saved game found. Loaded."));
+        //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Saved game found. Loaded."));
     }
 }
 
 void UDeadlyInstance::SaveGame()
 {
-    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Saving game..."));
+    //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Saving game..."));
 
     // Call SaveGameToSlot to serialize and save our SaveGameObject with name: <SaveGameSlotName>.sav
     bool IsSaved = UGameplayStatics::SaveGameToSlot(SaveGameObject, SaveGameSlotName, 0);
@@ -138,17 +138,17 @@ void UDeadlyInstance::LogIfGameWasSavedOrNot(const bool IsSaved)
 {
     if (IsSaved)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Game saved."));
+        //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Game saved."));
     }
     else
     {
-        GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Cannot save the game."));
+        //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Cannot save the game."));
     }
 }
 
 void UDeadlyInstance::spawnWidgets()
 {
-    GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Spawning that shit"));
+    //GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("Spawning that shit"));
 
     turnActionWidget = nullptr;
     turnOrderWidget = nullptr;

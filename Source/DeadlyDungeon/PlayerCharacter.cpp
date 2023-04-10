@@ -49,8 +49,8 @@ void APlayerCharacter::setStats(FPlayerStruct& stats)
 FPlayerStruct APlayerCharacter::getStats()
 {
 	FPlayerStruct playerStruct = {m_ID, static_cast<uint8>(m_characterClass), m_initiative, m_movement, m_attack, m_numberOfAttacks, m_maxHealth, m_range,m_name};
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("m_ID is: %i"),
-		m_ID));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("m_ID is: %i"),
+	//	m_ID));
 	return playerStruct;
 }
 
@@ -135,13 +135,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 		if (m_blastWait > 0)
 		{
 			m_blastWait -= DeltaTime;
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Blasting!"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Blasting!"));
 			return;
 		}
 		else
 		{	
 			isBlasting = false;			
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Blasted!"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Blasted!"));
 			BlastDone.Broadcast(m_attack);
 		}
 	}
@@ -233,7 +233,7 @@ bool APlayerCharacter::rdyToAttack()
 	}
 	else if (m_state == MOVING)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Can't attack! Still moving!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Can't attack! Still moving!"));
 		return false;
 	}
 	else
@@ -333,15 +333,13 @@ int APlayerCharacter::getCurrentHealth()
 }
 
 void APlayerCharacter::shootCorpse(const FRotator& direction)
-{
-	//UPhysicsHandleComponent* handler = GetWorld()->SpawnActor<UPhysicsHandleComponent>(m_physicsHandler, GetActorLocation(), GetActorRotation());
-	
+{	
 	FName SpineBone = "Spine01";
 	FVector BoneLocation = m_playerCharacterMesh->GetBoneLocation(SpineBone, EBoneSpaces::WorldSpace);
 	
 	if (BoneLocation != FVector(0, 0, 0))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Bone location set!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Bone location set!"));
 	}
 
 	ACharacterProjectile* projectile = GetWorld()->SpawnActor<ACharacterProjectile>(m_characterProjectile, BoneLocation, GetActorRotation());
@@ -349,19 +347,15 @@ void APlayerCharacter::shootCorpse(const FRotator& direction)
 	if (projectile)
 	{
 		projectile->ProjectileOverlap.AddDynamic(this, &APlayerCharacter::corpseHit);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Projectile activated!"));
 	}
-
-	//PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
 
 	if (PhysicsHandle == nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Handler not found!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Handler not found!"));
 	}
 
 	if (PhysicsHandle)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Handler activated!"));
 		PhysicsHandle->GrabComponentAtLocation(m_playerCharacterMesh, SpineBone, BoneLocation);
 		projectile->shoot(direction, PhysicsHandle);
 	}
@@ -373,7 +367,7 @@ void APlayerCharacter::corpseHit(ACharacterProjectile* projectile)
 	if (PhysicsHandle)
 	{
 		PhysicsHandle->ReleaseComponent();	
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Handler deactivate!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Handler deactivate!"));
 	}
 }
 
@@ -381,8 +375,8 @@ void APlayerCharacter::gotShot()
 {
 	if (m_currentHealth > 0)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Shot character ID: %i"),
-			m_hexLocationIndex));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Shot character ID: %i"),
+		//	m_hexLocationIndex));
 
 		CharShot.Broadcast(this);
 	}
@@ -400,7 +394,7 @@ void APlayerCharacter::characterClicked()
 
 void APlayerCharacter::characterSelected()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Clicked!"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Clicked!"));
 	CharSelect.Broadcast(this);
 }
 
@@ -421,7 +415,7 @@ void APlayerCharacter::createRenderTarget()
 
 void APlayerCharacter::setBlasting()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Set to Blast!"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Set to Blast!"));
 	m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(m_blastAnim, false);
 	isBlasting = true;
 }

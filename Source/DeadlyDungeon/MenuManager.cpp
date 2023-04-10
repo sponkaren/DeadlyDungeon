@@ -140,7 +140,7 @@ void AMenuManager::populateInfo(APlayerCharacter* character)
 	unitInfoWidget->setText(character->getStats());
 	
 	//always max hp in the menu
-	unitInfoWidget->setHealth(1);
+	unitInfoWidget->setHealth(1,character->m_maxHealth, character->m_currentHealth);
 
 	unitInfoWidget->setImage(character->iconMaterial);
 }

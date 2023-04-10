@@ -83,12 +83,12 @@ public:
 	void movementCalc(TArray<int>& movementArray, int hexIndex, int movementLeft, int& locPrio, int range=1, bool highlighting=false);
 
 	int getAttractiveness(AHexTile* start, AHexTile* next, AHexTile* end);
-	int getGStar(AHexTile* ref, AHexTile* end);
+	int getRelativeDistance(AHexTile* ref, AHexTile* end);
 
 	void setPriorities(int targetHex, int locHex, int range=1, bool rangeCheck=false);
 	void clearPriorities();
 
-	void sortByGStar(int startIndex);
+	void sortByDistance(int startIndex);
 	void setIndexArray();
 
 

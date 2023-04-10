@@ -123,9 +123,6 @@ void AHexTile::setMovePrio(int prio, bool debug)
 	{
 		displayMovePrio();
 	}
-	if(!debug)
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No debug!"));
-
 }
 
 void AHexTile::displayMovePrio()

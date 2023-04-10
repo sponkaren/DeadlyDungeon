@@ -79,7 +79,7 @@ void APlayerManager::populateInfo(APlayerCharacter* character)
 	character->infoPopup = true;
 
 	unitInfoWidget->setText(character->getStats());
-	unitInfoWidget->setHealth(character->getCurrentHealthPercent());
+	unitInfoWidget->setHealth(character->getCurrentHealthPercent(), character->m_maxHealth, character->m_currentHealth);
 	unitInfoWidget->setImage(character->iconMaterial);
 
 }
@@ -159,7 +159,7 @@ void APlayerManager::spawnPlayer(FPlayerStruct& stats, int hexIndex, bool enemy)
 	newPlayer->createRenderTarget();
 
 	newPlayer->CharClicked.AddDynamic(this, &APlayerManager::characterClicked);
-	newPlayer->CharIdle.AddDynamic(this, &APlayerManager::setIdle);
+	newPlayer->CharIdle.AddDynamic(this, &APlayerManager::executeActions);
 	newPlayer->CharShot.AddDynamic(this, &APlayerManager::characterShot);
 	newPlayer->CharSelect.AddDynamic(this, &APlayerManager::populateInfo);
 	newPlayer->BlastDone.AddDynamic(this, &APlayerManager::dealDamage);
@@ -183,6 +183,7 @@ void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
 	}
 
 	lastClicked = character;
+	populateInfo(character);
 	character->setArrowOn(true);
 	character->resetMoveAtk();
 	characterMovement.Empty();
@@ -196,7 +197,7 @@ void APlayerManager::setSelectedCharacter(APlayerCharacter* character)
 	}
 	else
 	{
-		setIdle(m_selectedCharacter);
+		executeActions(m_selectedCharacter);
 	}
 }
 
@@ -219,11 +220,7 @@ void APlayerManager::startAI()
 		return;
 	}
 
-	int targetHex = hexManager->findClosestTarget(characterHex, targetLocations, m_selectedCharacter->m_range);
-	
-	
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
-	//	targetHex));
+	int targetHex = hexManager->findClosestTarget(characterHex, targetLocations, m_selectedCharacter->m_range);	
 
 	if (targetHex >= 0) 
 	{
@@ -235,16 +232,10 @@ void APlayerManager::startAI()
 	{
 		targetHex = hexManager->findClosestRangeTarget(characterHex, targetLocations, m_selectedCharacter->m_range);
 
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Target hexInt: %i"),
-		//	targetHex));
-
 		hexManager->calculateMoveTowards(characterMovement, targetHex, characterHex, m_selectedCharacter->m_movementLeft, m_selectedCharacter->m_range);
 	}
 
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::Printf(TEXT("Number of moves(pm): %i"),
-	//	characterMovement.Num()));
-
-	setIdle(m_selectedCharacter);
+	executeActions(m_selectedCharacter);
 }
 
 void APlayerManager::moveEnemy(int movement) 
@@ -279,7 +270,7 @@ void APlayerManager::occupiedHexClicked(int hexIndex)
 {
 	if (!m_selectedCharacter->getAttacking())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Occupied!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Occupied!"));
 	}
 }
 
@@ -324,8 +315,8 @@ void APlayerManager::characterClicked(APlayerCharacter* character)
 		m_selectedCharacter->AITarget = character->getHexLocation();
 		hexManager->HexGridArray[m_selectedCharacter->AITarget]->setAttackSelectHighightVisible(true);
 	}
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Out of range!"));
+	//else
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Out of range!"));
 }
 
 void APlayerManager::characterAttacked(APlayerCharacter* character)
@@ -351,7 +342,7 @@ void APlayerManager::characterAttacked(APlayerCharacter* character)
 
 		if (--m_selectedCharacter->m_numberOfAttacksLeft <= 0)
 		{
-			setIdle(m_selectedCharacter);
+			executeActions(m_selectedCharacter);
 		}
 		*/
 	}
@@ -367,12 +358,12 @@ void APlayerManager::dealDamage(float attack)
 
 	if (attackedCharacter == populator)
 	{
-		unitInfoWidget->setHealth(attackedCharacter->getCurrentHealthPercent());
+		unitInfoWidget->setHealth(attackedCharacter->getCurrentHealthPercent(), attackedCharacter->m_maxHealth, attackedCharacter->m_currentHealth);
 	}
 
 	if (--m_selectedCharacter->m_numberOfAttacksLeft <= 0)
 	{
-		setIdle(m_selectedCharacter);
+		executeActions(m_selectedCharacter);
 	}
 
 	attackedCharacter = nullptr;
@@ -382,7 +373,7 @@ void APlayerManager::whenHexClicked(AHexTile* hex)
 {
 	if (!m_selectedCharacter)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No selected character"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("No selected character"));
 	}
 	else if (m_selectedCharacter->getHexLocation() == hex->m_index)
 	{
@@ -481,7 +472,7 @@ void APlayerManager::checkGameOver()
 	}
 	if (enemyAlive && playerAlive)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Game goes on!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Game goes on!"));
 	}
 	else if (enemyAlive)
 	{
@@ -560,7 +551,7 @@ void APlayerManager::selectedIdle(bool ally)
 	}
 }
 
-void APlayerManager::setIdle(APlayerCharacter* character)
+void APlayerManager::executeActions(APlayerCharacter* character)
 {
 
 	if (characterMovement.Num() > 0)
@@ -603,7 +594,7 @@ void APlayerManager::setIdle(APlayerCharacter* character)
 		{
 			hexManager->highlightTiles(character->getHexLocation(),m_selectedCharacter->m_movementLeft);	
 		}
-		else
+		else if (character->AIAttack == false)
 		{
 			character->m_playerCharacterMesh->USkeletalMeshComponent::PlayAnimation(character->m_idleAnim, true);
 		}
@@ -614,7 +605,7 @@ void APlayerManager::setIdle(APlayerCharacter* character)
 		{
 			targetLocations.Emplace(possibleTarget->getHexLocation());
 		}
-		if (character->m_numberOfAttacksLeft > 0)
+		if (character->m_numberOfAttacksLeft > 0 && character->AIAttack == false)
 		{
 			hexManager->findClosestTarget(m_selectedCharacter->getHexLocation(), targetLocations, m_selectedCharacter->m_range, true, m_selectedCharacter->m_movementLeft);
 		}
@@ -625,7 +616,7 @@ void APlayerManager::executeClicked(bool active)
 {
 	if (active)
 	{
-		setIdle(m_selectedCharacter);
+		executeActions(m_selectedCharacter);
 	}
 }
 
@@ -680,6 +671,6 @@ void APlayerManager::hoverChange(int index, bool on)
 
 void APlayerManager::setDebugMode(bool on)
 {
-	debugMode = true;
+	debugMode = on;
 	hexManager->debugMode = debugMode;
 }

@@ -47,11 +47,11 @@ void ACharacterProjectile::Tick(float DeltaTime)
 
 void ACharacterProjectile::shoot(FRotator direction, UPhysicsHandleComponent* handler)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("YEET!"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("YEET!"));
 
 	m_handler = handler;
 	m_direction = direction;
-	m_lerpDuration = 5;
+	m_lerpDuration = 6;
 	m_timeElapsed = 0;
 	m_origin = GetActorLocation();
 	m_destination = m_origin + direction.Vector() * -5000;
